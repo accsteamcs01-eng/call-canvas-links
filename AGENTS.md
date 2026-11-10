@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Storage buckets are private (workspace blocks public buckets); uploads store a 10-year signed URL in the row so the public call page can load media without auth.
+- Public call page (/c/$slug) is client-rendered (ssr: false) and must stay free of admin branding; `?preview=1` disables event tracking.
+- Preset ringtones are synthesized with WebAudio in src/lib/ringtone.ts (no audio files).

@@ -1,4 +1,4 @@
-export function CallBackdrop({ src, dark = false }: { src?: string | null; dark?: boolean }) {
+export function CallBackdrop({ src, dark = false }: { src?: string | null | undefined; dark?: boolean }) {
   return (
     <div className="absolute inset-0 overflow-hidden bg-call-dark">
       {src && (
@@ -14,7 +14,7 @@ export function CallBackdrop({ src, dark = false }: { src?: string | null; dark?
   );
 }
 
-export function Avatar({ src, name, size = 140 }: { src?: string | null; name: string; size?: number }) {
+export function Avatar({ src, name, size = 140 }: { src?: string | null | undefined; name: string; size?: number }) {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)

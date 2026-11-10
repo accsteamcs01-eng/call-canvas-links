@@ -3,8 +3,8 @@ import { ClockIcon, MessageIcon, PhoneDownIcon, VideoIcon } from "./CallIcons";
 
 interface Props {
   name: string;
-  photo?: string | null;
-  background?: string | null;
+  photo?: string | null | undefined;
+  background?: string | null | undefined;
   subtitle: string;
   onAccept: () => void;
   onDecline: () => void;

@@ -3,8 +3,8 @@ import { PhoneIcon } from "./CallIcons";
 
 interface Props {
   name: string;
-  photo?: string | null;
-  background?: string | null;
+  photo?: string | null | undefined;
+  background?: string | null | undefined;
   title: string;
   detail?: string;
   actionLabel: string;

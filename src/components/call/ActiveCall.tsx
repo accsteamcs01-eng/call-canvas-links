@@ -9,8 +9,8 @@ import { Avatar, CallBackdrop } from "./CallBackdrop";
 
 interface Props {
   name: string;
-  photo?: string | null;
-  background?: string | null;
+  photo?: string | null | undefined;
+  background?: string | null | undefined;
   video: ParsedVideo;
   stream: MediaStream | null;
   showUnmuteButton: boolean;

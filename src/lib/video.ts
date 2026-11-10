@@ -14,7 +14,7 @@ export function parseVideoInput(raw: string): ParsedVideo | null {
   if (!input) return null;
 
   const iframeMatch = input.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
-  if (iframeMatch) input = iframeMatch[1];
+  if (iframeMatch?.[1]) input = iframeMatch[1];
   if (input.startsWith("//")) input = "https:" + input;
 
   let u: URL;
@@ -31,15 +31,15 @@ export function parseVideoInput(raw: string): ParsedVideo | null {
     else if (u.pathname.startsWith("/watch")) id = u.searchParams.get("v") ?? "";
     else {
       const m = u.pathname.match(/\/(embed|shorts|live|v)\/([^/?]+)/);
-      if (m) id = m[2];
+      if (m?.[2]) id = m[2];
     }
-    id = id.split(/[?&/]/)[0];
+    id = id.split(/[?&/]/)[0] ?? "";
     if (id) return { type: "youtube", id, url: `https://www.youtube.com/watch?v=${id}` };
   }
 
   if (host.endsWith("vimeo.com")) {
     const m = u.pathname.match(/(\d{5,})/);
-    if (m) return { type: "vimeo", id: m[1], url: `https://vimeo.com/${m[1]}` };
+    if (m?.[1]) return { type: "vimeo", id: m[1], url: `https://vimeo.com/${m[1]}` };
   }
 
   const path = u.pathname.toLowerCase();
@@ -55,7 +55,7 @@ export function parseVideoInput(raw: string): ParsedVideo | null {
 export function fromStored(url: string, type: VideoType): ParsedVideo {
   const parsed = parseVideoInput(url);
   if (parsed && parsed.type === type) return parsed;
-  return { type, url, isHls: url.toLowerCase().split("?")[0].endsWith(".m3u8") };
+  return { type, url, isHls: !!url.toLowerCase().split("?")[0]?.endsWith(".m3u8") };
 }
 
 export function embedUrl(v: ParsedVideo, opts: { muted?: boolean; controls?: boolean } = {}): string {
