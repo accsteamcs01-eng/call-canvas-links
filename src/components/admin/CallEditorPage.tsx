@@ -16,8 +16,8 @@ export function CallEditorPage({ initial }: { initial?: Call | null }) {
   const link = saved ? `${window.location.origin}/c/${saved.slug}` : "";
 
   return (
-    <div className="mx-auto min-h-dvh max-w-2xl px-4 py-8">
-      <Link to="/admin" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+    <div className="mx-auto max-w-2xl">
+      <Link to="/admin/chamadas" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Voltar
       </Link>
       <h1 className="mb-6 font-display text-2xl font-semibold">{initial ? "Editar chamada" : "Nova chamada"}</h1>

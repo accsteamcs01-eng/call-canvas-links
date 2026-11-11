@@ -48,10 +48,12 @@ export type Database = {
       }
       calls: {
         Row: {
+          archived: boolean
           background_url: string | null
           created_at: string
           fullscreen_video: boolean
           id: string
+          is_active: boolean
           person_name: string
           person_photo_url: string | null
           ringtone_type: string
@@ -66,10 +68,12 @@ export type Database = {
           video_url: string
         }
         Insert: {
+          archived?: boolean
           background_url?: string | null
           created_at?: string
           fullscreen_video?: boolean
           id?: string
+          is_active?: boolean
           person_name?: string
           person_photo_url?: string | null
           ringtone_type?: string
@@ -84,10 +88,12 @@ export type Database = {
           video_url?: string
         }
         Update: {
+          archived?: boolean
           background_url?: string | null
           created_at?: string
           fullscreen_video?: boolean
           id?: string
+          is_active?: boolean
           person_name?: string
           person_photo_url?: string | null
           ringtone_type?: string

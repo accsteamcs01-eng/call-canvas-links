@@ -80,6 +80,10 @@
   --color-call-dark: var(--call-dark);
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --color-admin-blue: var(--admin-blue);
+  --color-admin-green: var(--admin-green);
+  --color-admin-white: var(--admin-white);
+  --font-admin: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-call: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Roboto", system-ui, sans-serif;
 }
 
@@ -130,7 +134,42 @@
   --call-dark: oklch(0.14 0.02 240);
   --gradient-brand: linear-gradient(135deg, oklch(0.7 0.14 235), oklch(0.72 0.15 200));
   --shadow-card: 0 10px 30px -12px oklch(0 0 0 / 0.6);
+  --admin-blue: oklch(0.7 0.14 236);   /* #2AABEE */
+  --admin-green: oklch(0.75 0.19 148); /* #34C759 */
+  --admin-white: oklch(1 0 0);
 }
+
+/* Admin-only light theme: the class is set on <html> solely while the /admin panel is mounted. */
+html.admin-light {
+  --background: oklch(0.985 0.003 250);
+  --foreground: oklch(0.2 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 250);
+  --primary: oklch(0.62 0.15 236);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.955 0.006 250);
+  --secondary-foreground: oklch(0.25 0.02 250);
+  --muted: oklch(0.955 0.006 250);
+  --muted-foreground: oklch(0.5 0.02 250);
+  --accent: oklch(0.94 0.03 236);
+  --accent-foreground: oklch(0.25 0.03 250);
+  --border: oklch(0.91 0.008 250);
+  --input: oklch(0.91 0.008 250);
+  --ring: oklch(0.62 0.15 236);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.25 0.02 250);
+  --sidebar-accent: oklch(0.95 0.015 236);
+  --sidebar-accent-foreground: oklch(0.2 0.02 250);
+  --sidebar-border: oklch(0.92 0.008 250);
+  --sidebar-primary: oklch(0.62 0.15 236);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --shadow-card: 0 8px 24px -14px oklch(0.3 0.03 250 / 0.25);
+  color-scheme: light;
+}
+.admin-root { font-family: var(--font-admin); }
+.admin-root * { transition-duration: 180ms; }
 
 @layer base {
   * {

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { LogoIcon } from "@/admin/components/Logo";
+import { BRAND_NAME } from "@/admin/brand";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -47,11 +49,11 @@ function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4">
+    <div className="admin-root flex min-h-dvh items-center justify-center bg-[radial-gradient(ellipse_at_top,var(--accent),transparent_60%)] px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-2xl border bg-card p-7 shadow-card">
-        <div>
-          <div className="mb-4 h-10 w-10 rounded-xl bg-brand" />
-          <h1 className="font-display text-2xl font-semibold">CallSim</h1>
+        <div className="text-center">
+          <LogoIcon className="mx-auto mb-4 h-12 w-12" />
+          <h1 className="text-2xl font-semibold tracking-tight">{BRAND_NAME}</h1>
           <p className="text-sm text-muted-foreground">{mode === "in" ? "Entre no seu painel" : "Crie sua conta de administrador"}</p>
         </div>
         <div className="space-y-2">

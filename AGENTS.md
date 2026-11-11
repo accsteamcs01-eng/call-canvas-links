@@ -33,3 +33,4 @@ use the editor.
 - Storage buckets are private (workspace blocks public buckets); uploads store a 10-year signed URL in the row so the public call page can load media without auth.
 - Public call page (/c/$slug) is client-rendered (ssr: false) and must stay free of admin branding; `?preview=1` disables event tracking.
 - Preset ringtones are synthesized with WebAudio in src/lib/ringtone.ts (no audio files).
+- Admin panel code lives in src/admin (separate from src/components/call); its light theme and Inter font are applied only while the /admin layout is mounted (class on <html>, injected <link>) so the public call page never changes.
