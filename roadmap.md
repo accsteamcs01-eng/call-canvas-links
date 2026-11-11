@@ -1,0 +1,3 @@
+- [x] Add nullable link-preview columns without changing existing columns or RLS.
+- [x] Add image upload, optional text fields, and live WhatsApp card simulation to create/edit forms.
+- [x] Verify image limits, fallback rules, and saving/reopening the form.

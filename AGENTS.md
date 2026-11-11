@@ -34,3 +34,4 @@ use the editor.
 - Public call page (/c/$slug) is client-rendered (ssr: false) and must stay free of admin branding; `?preview=1` disables event tracking.
 - Preset ringtones are synthesized with WebAudio in src/lib/ringtone.ts (no audio files).
 - Admin panel code lives in src/admin (separate from src/components/call); its light theme and Inter font are applied only while the /admin layout is mounted (class on <html>, injected <link>) so the public call page never changes.
+- Link-preview fields and fallback logic belong to src/admin; persist empty overrides as null so defaults can follow changes to the caller without modifying the public call experience.

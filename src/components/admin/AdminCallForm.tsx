@@ -11,6 +11,7 @@ import { randomSlug, uploadMedia, type Call } from "@/lib/calls";
 import { PRESET_RINGTONES, Ringer } from "@/lib/ringtone";
 import { embedUrl, parseVideoInput } from "@/lib/video";
 import { ImageCropper } from "./ImageCropper";
+import { LinkPreviewFields } from "@/admin/components/LinkPreviewFields";
 
 interface Props {
   initial?: Call | null;
@@ -25,6 +26,9 @@ export function AdminCallForm({ initial, onSaved }: Props) {
   const [name, setName] = useState(initial?.person_name ?? "");
   const [photo, setPhoto] = useState<string | null>(initial?.person_photo_url ?? null);
   const [bg, setBg] = useState<string | null>(initial?.background_url ?? null);
+  const [previewImage, setPreviewImage] = useState<string | null>(initial?.preview_image_url ?? null);
+  const [previewTitle, setPreviewTitle] = useState(initial?.preview_title ?? "");
+  const [previewDescription, setPreviewDescription] = useState(initial?.preview_description ?? "");
   const [ringType, setRingType] = useState<"preset" | "custom">((initial?.ringtone_type as "preset") ?? "preset");
   const [ringValue, setRingValue] = useState(initial?.ringtone_value ?? "classic");
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? "Chamada de vídeo");
@@ -83,6 +87,9 @@ export function AdminCallForm({ initial, onSaved }: Props) {
       person_name: name.trim(),
       person_photo_url: photo,
       background_url: bg,
+      preview_image_url: previewImage,
+      preview_title: previewTitle.trim() || null,
+      preview_description: previewDescription.trim() || null,
       ringtone_type: ringType,
       ringtone_value: ringValue,
       subtitle: subtitle.trim() || "Chamada de vídeo",
@@ -187,6 +194,19 @@ export function AdminCallForm({ initial, onSaved }: Props) {
           </div>
         </Field>
       </div>
+
+      <LinkPreviewFields
+        name={name}
+        photo={photo}
+        image={previewImage}
+        title={previewTitle}
+        description={previewDescription}
+        busy={!!busy}
+        onImage={setPreviewImage}
+        onTitle={setPreviewTitle}
+        onDescription={setPreviewDescription}
+        onUpload={(file) => upload("photos", file, file.name.split(".").pop() || "jpg", "Enviando prévia...")}
+      />
 
       <Field label="Toque de chamada">
         <div className="grid grid-cols-2 gap-2">

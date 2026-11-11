@@ -56,6 +56,9 @@ export type Database = {
           is_active: boolean
           person_name: string
           person_photo_url: string | null
+          preview_description: string | null
+          preview_image_url: string | null
+          preview_title: string | null
           ringtone_type: string
           ringtone_value: string
           slug: string
@@ -76,6 +79,9 @@ export type Database = {
           is_active?: boolean
           person_name?: string
           person_photo_url?: string | null
+          preview_description?: string | null
+          preview_image_url?: string | null
+          preview_title?: string | null
           ringtone_type?: string
           ringtone_value?: string
           slug: string
@@ -96,6 +102,9 @@ export type Database = {
           is_active?: boolean
           person_name?: string
           person_photo_url?: string | null
+          preview_description?: string | null
+          preview_image_url?: string | null
+          preview_title?: string | null
           ringtone_type?: string
           ringtone_value?: string
           slug?: string
