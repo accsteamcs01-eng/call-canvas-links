@@ -15,4 +15,16 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // Pre-bundle admin panel libraries so the dev server never re-optimizes mid-session
+    // (re-optimizing loads two React copies in an open tab -> "Cannot read properties of null (reading 'use')").
+    optimizeDeps: {
+      include: [
+        "recharts", "qrcode", "cmdk",
+        "@radix-ui/react-dropdown-menu", "@radix-ui/react-separator", "@radix-ui/react-tooltip",
+        "@radix-ui/react-alert-dialog", "@radix-ui/react-checkbox", "@radix-ui/react-select",
+        "@radix-ui/react-switch", "@radix-ui/react-toggle-group", "@radix-ui/react-dialog",
+      ],
+    },
+  },
 });
