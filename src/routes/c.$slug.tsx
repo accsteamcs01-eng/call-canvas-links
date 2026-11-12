@@ -4,18 +4,36 @@ import { CallExperience } from "@/components/call/CallExperience";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/c/$slug")({
-  ssr: false,
+  // data-only: server reads the share fields so WhatsApp/Telegram see them; the call UI still renders client-side.
+  ssr: "data-only",
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("calls")
+      .select("person_name, person_photo_url, preview_image_url, preview_title, preview_description")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    return { share: data };
+  },
   validateSearch: (s: Record<string, unknown>) => ({ preview: s["preview"] ? 1 : undefined }),
-  head: () => ({
+  head: ({ loaderData }) => {
+    const c = loaderData?.share;
+    const title = c?.preview_title?.trim() || (c ? `${c.person_name?.trim() || "Alguém"} está te ligando` : "Chamada de vídeo");
+    const description = c?.preview_description?.trim() || "Chamada de vídeo • Toque para atender";
+    const image = c?.preview_image_url || c?.person_photo_url || null;
+    return {
     meta: [
-      { title: "Chamada de vídeo" },
-      { name: "description", content: "Chamada de vídeo recebida" },
-      { property: "og:title", content: "Chamada de vídeo" },
-      { property: "og:description", content: "Você está recebendo uma chamada de vídeo." },
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+      ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" },
       { name: "theme-color", content: "#000000" },
     ],
-  }),
+    };
+  },
   component: CallPage,
 });
 
