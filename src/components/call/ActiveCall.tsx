@@ -6,6 +6,7 @@ import { LockIcon, SpeakerIcon } from "./CallIcons";
 import { RemoteVideo } from "./RemoteVideo";
 import { SelfView } from "./SelfView";
 import { Avatar, CallBackdrop } from "./CallBackdrop";
+import type { IosChromePlayback } from "@/lib/iosChromeFix";
 
 interface Props {
   name: string;
@@ -16,11 +17,13 @@ interface Props {
   showUnmuteButton: boolean;
   onFlipCamera: (facing: "user" | "environment") => Promise<MediaStream | null>;
   onEnd: (seconds: number) => void;
+  iosPlayback?: IosChromePlayback | null;
+  iosMutedFallback?: boolean;
 }
 
 const EMOJIS = ["🐼", "🎈", "🍀", "🚀"];
 
-export function ActiveCall({ name, photo, background, video, stream: initialStream, showUnmuteButton, onFlipCamera, onEnd }: Props) {
+export function ActiveCall({ name, photo, background, video, stream: initialStream, showUnmuteButton, onFlipCamera, onEnd, iosPlayback, iosMutedFallback }: Props) {
   const [seconds, setSeconds] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [cameraOn, setCameraOn] = useState(true);
@@ -33,6 +36,12 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const secondsRef = useRef(0);
   const ended = useRef(false);
+
+  useEffect(() => {
+    if (!iosPlayback || !iosMutedFallback) return;
+    setSpeakerOn(false);
+    setNeedsUnmute(true);
+  }, [iosPlayback, iosMutedFallback]);
 
   useEffect(() => {
     const t = setInterval(() => setSeconds((s) => (secondsRef.current = s + 1)), 1000);
@@ -84,6 +93,7 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
       ) : (
         <RemoteVideo
           video={video}
+          iosPlayback={iosPlayback ?? null}
           muted={!speakerOn}
           onEnded={finish}
           onAutoplayMuted={() => {
@@ -118,7 +128,7 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
         </div>
       </div>
 
-      <SelfView stream={stream} cameraOn={cameraOn} mirrored={facing === "user"} bottomInset={controlsVisible ? 120 : 20} />
+      <SelfView stream={stream} cameraOn={cameraOn} mirrored={facing === "user"} bottomInset={controlsVisible ? 120 : 20} iosPlayback={iosPlayback ?? null} />
 
       {needsUnmute && (
         <button
@@ -127,6 +137,10 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
             e.stopPropagation();
             setSpeakerOn(true);
             setNeedsUnmute(false);
+            if (iosPlayback?.main) {
+              iosPlayback.main.muted = false;
+              iosPlayback.retry();
+            }
           }}
           className="absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-call-panel px-5 py-3 text-[15px] font-medium backdrop-blur-xl transition-transform active:scale-95"
         >

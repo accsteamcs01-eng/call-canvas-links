@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatDuration, logCallEvent, type Call } from "@/lib/calls";
 import { Ringer } from "@/lib/ringtone";
 import { fromStored, type VideoType } from "@/lib/video";
+import { useIosChromeFix } from "@/lib/iosChromeFix";
+import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 import { ActiveCall } from "./ActiveCall";
 import { Avatar, CallBackdrop } from "./CallBackdrop";
 import { EndedScreen } from "./EndedScreen";
@@ -17,6 +20,7 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
   const rootRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const video = useMemo(() => fromStored(call.video_url, call.video_type as VideoType), [call]);
+  const iosFix = useIosChromeFix(rootRef, video, state === "active");
 
   const log = useCallback(
     (e: "opened" | "answered" | "declined" | "ended", d?: number) => {
@@ -74,13 +78,17 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = s;
       setStream(s);
+      iosFix.playback?.cameraReady(s);
       return s;
-    } catch {
+    } catch (error) {
+      iosFix.playback?.record("getUserMedia", error);
+      iosFix.playback?.cameraReady(null);
       return null;
     }
   };
 
   const accept = async () => {
+    iosFix.playback?.prepare();
     ringer.current?.stop();
     log("answered");
     if (call.fullscreen_video && rootRef.current?.requestFullscreen) {
@@ -100,6 +108,7 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
   };
 
   const end = (secs: number) => {
+    iosFix.playback?.stop();
     stopStream();
     setDuration(secs);
     log("ended", secs);
@@ -111,7 +120,7 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
 
   return (
     <div ref={rootRef} className="call-root relative h-full w-full overflow-hidden bg-call-black">
-      {video.type === "mp4" && state === "incoming" && (
+      {video.type === "mp4" && state === "incoming" && !iosFix.playback && (
         <video src={video.url} preload="auto" muted className="hidden" aria-hidden />
       )}
 
@@ -146,6 +155,8 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
           video={video}
           stream={stream}
           showUnmuteButton={call.unmute_button}
+          iosPlayback={iosFix.playback}
+          iosMutedFallback={iosFix.mutedFallback}
           onFlipCamera={getCamera}
           onEnd={end}
         />
@@ -165,6 +176,17 @@ export function CallExperience({ call, track = true }: { call: Call; track?: boo
       )}
 
       {state === "closed" && <div className="absolute inset-0 bg-call-black" />}
+      {state === "active" && iosFix.needsStart && (
+        <Button type="button" variant="ghost" aria-label="Iniciar vídeo" onClick={() => iosFix.playback?.retry()}
+          className="absolute left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded-full bg-call-panel text-call-ink backdrop-blur-xl">
+          <Play /> Iniciar vídeo
+        </Button>
+      )}
+      {iosFix.debug && (
+        <div className="pointer-events-none absolute bottom-2 left-2 z-50 whitespace-pre-line bg-call-panel p-2 text-[10px] text-call-ink">
+          {iosFix.diagnostics.join("\n")}
+        </div>
+      )}
     </div>
   );
 }

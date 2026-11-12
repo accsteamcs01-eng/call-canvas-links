@@ -217,3 +217,17 @@ html.admin-light {
   user-select: none;
   touch-action: manipulation;
 }
+
+/* Never applied outside Chrome on iOS; limited to call videos. */
+html.ios-chrome-call-fix .call-root video::-webkit-media-controls-start-playback-button,
+html.ios-chrome-call-fix .call-root video::-webkit-media-controls {
+  display: none !important;
+}
+.ios-chrome-call-fix .ios-chrome-video-staging {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

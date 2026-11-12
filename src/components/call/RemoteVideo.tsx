@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { embedUrl, type ParsedVideo } from "@/lib/video";
+import type { IosChromePlayback } from "@/lib/iosChromeFix";
+import { IosChromeVideo } from "./IosChromeVideo";
 
 interface Props {
   video: ParsedVideo;
@@ -7,10 +9,11 @@ interface Props {
   onEnded: () => void;
   onAutoplayMuted: () => void;
   onError: () => void;
+  iosPlayback?: IosChromePlayback | null;
 }
 
 /** Full-screen remote "participant" video with no visible player controls. */
-export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError }: Props) {
+export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError, iosPlayback }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const cb = useRef({ onEnded, onAutoplayMuted, onError });
@@ -19,6 +22,15 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError }:
   // Direct video (mp4/webm/m3u8)
   useEffect(() => {
     if (video.type !== "mp4") return;
+    if (iosPlayback?.main) {
+      const main = iosPlayback.main;
+      const end = () => cb.current.onEnded();
+      const error = () => cb.current.onError();
+      main.addEventListener("ended", end);
+      main.addEventListener("error", error);
+      iosPlayback.retry();
+      return () => { main.removeEventListener("ended", end); main.removeEventListener("error", error); };
+    }
     const el = videoRef.current;
     if (!el) return;
     let hls: { destroy: () => void } | null = null;
@@ -58,10 +70,11 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError }:
       cancelled = true;
       hls?.destroy();
     };
-  }, [video]);
+  }, [video, iosPlayback]);
 
   useEffect(() => {
     if (video.type === "mp4" && videoRef.current) videoRef.current.muted = muted;
+    if (iosPlayback?.main) iosPlayback.main.muted = muted;
     const win = iframeRef.current?.contentWindow;
     if (!win) return;
     if (video.type === "youtube") {
@@ -69,7 +82,7 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError }:
     } else if (video.type === "vimeo") {
       win.postMessage(JSON.stringify({ method: "setVolume", value: muted ? 0 : 1 }), "*");
     }
-  }, [muted, video.type]);
+  }, [muted, video.type, iosPlayback]);
 
   // Detect end of embedded players
   useEffect(() => {
@@ -107,6 +120,7 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError }:
   };
 
   if (video.type === "mp4") {
+    if (iosPlayback?.main) return <IosChromeVideo video={iosPlayback.main} className="absolute inset-0 h-full w-full" />;
     return (
       <video
         ref={videoRef}

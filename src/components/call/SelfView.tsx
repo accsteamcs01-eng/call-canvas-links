@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./CallBackdrop";
+import type { IosChromePlayback } from "@/lib/iosChromeFix";
+import { IosChromeVideo } from "./IosChromeVideo";
 
 type Corner = "tl" | "tr" | "bl" | "br";
 
@@ -9,6 +11,7 @@ interface Props {
   mirrored: boolean;
   name?: string;
   bottomInset: number;
+  iosPlayback?: IosChromePlayback | null;
 }
 
 const W = 108;
@@ -16,7 +19,7 @@ const H = 160;
 const M = 12;
 
 /** Draggable rounded self-view that snaps to the nearest corner. */
-export function SelfView({ stream, cameraOn, mirrored, bottomInset }: Props) {
+export function SelfView({ stream, cameraOn, mirrored, bottomInset, iosPlayback }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const [corner, setCorner] = useState<Corner>("tr");
@@ -29,6 +32,12 @@ export function SelfView({ stream, cameraOn, mirrored, bottomInset }: Props) {
       videoRef.current.play().catch(() => {});
     }
   }, [stream, cameraOn]);
+
+  useEffect(() => {
+    if (!iosPlayback) return;
+    iosPlayback.self.style.transform = mirrored ? "scaleX(-1)" : "";
+    if (cameraOn) iosPlayback.retry();
+  }, [iosPlayback, mirrored, cameraOn, stream]);
 
   const parentRect = () => boxRef.current?.parentElement?.getBoundingClientRect();
 
@@ -79,6 +88,7 @@ export function SelfView({ stream, cameraOn, mirrored, bottomInset }: Props) {
       }}
     >
       {stream && cameraOn ? (
+        iosPlayback ? <IosChromeVideo video={iosPlayback.self} className="h-full w-full" /> :
         <video
           ref={videoRef}
           muted
