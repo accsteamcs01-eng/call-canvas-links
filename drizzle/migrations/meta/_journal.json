@@ -36,6 +36,13 @@
       "when": 1794441033284,
       "tag": "0004_call_link_preview_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794763809382,
+      "tag": "0005_scope_call_and_media_reads",
+      "breakpoints": true
     }
   ]
 }

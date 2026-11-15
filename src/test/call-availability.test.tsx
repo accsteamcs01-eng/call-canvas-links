@@ -18,22 +18,14 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    from: () => {
-      const filters: Array<[string, unknown]> = [];
-      const query = {
-        select: () => query,
-        eq: (key: string, value: unknown) => {
-          filters.push([key, value]);
-          mock.filters.push([key, value]);
-          return query;
-        },
+    rpc: (name: string, args: { call_slug: string }) => {
+      mock.filters.push([name, args.call_slug]);
+      return {
         maybeSingle: async () => ({
-          data: filters.some(([key, value]) => key === "is_active" && value === true)
-            && mock.row?.is_active !== true ? null : mock.row,
+          data: mock.row?.is_active === true ? mock.row : null,
           error: null,
         }),
       };
-      return query;
     },
   },
 }));
@@ -65,7 +57,7 @@ describe("Public call availability", () => {
     const loader = Route.options.loader as (input: { params: { slug: string } }) => Promise<{ share: unknown }>;
     const result = await loader({ params: { slug: "test-call" } });
     expect(result.share).toBeNull();
-    expect(mock.filters).toContainEqual(["is_active", true]);
+    expect(mock.filters).toContainEqual(["get_public_call", "test-call"]);
   });
 
   it("blocks inactive playback even with preview=1 and a cached active row", async () => {
@@ -81,7 +73,7 @@ describe("Public call availability", () => {
     mock.row = { id: "test-id", is_active: true };
     const client = openCall();
     await waitFor(() => expect(mock.experience).toHaveBeenCalledWith({ call: mock.row, track: true }));
-    expect(mock.filters).toContainEqual(["is_active", true]);
+    expect(mock.filters).toContainEqual(["get_public_call", "test-call"]);
     client.clear();
   });
 });

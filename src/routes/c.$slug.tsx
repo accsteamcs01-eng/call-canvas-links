@@ -7,13 +7,15 @@ export const Route = createFileRoute("/c/$slug")({
   // data-only: server reads the share fields so WhatsApp/Telegram see them; the call UI still renders client-side.
   ssr: "data-only",
   loader: async ({ params }) => {
-    const { data } = await supabase
-      .from("calls")
-      .select("person_name, person_photo_url, preview_image_url, preview_title, preview_description")
-      .eq("slug", params.slug)
-      .eq("is_active", true)
-      .maybeSingle();
-    return { share: data };
+    const { data, error } = await supabase.rpc("get_public_call", { call_slug: params.slug }).maybeSingle();
+    if (error) throw new Error("Chamada indisponível");
+    return { share: data ? {
+      person_name: data.person_name,
+      person_photo_url: data.person_photo_url,
+      preview_image_url: data.preview_image_url,
+      preview_title: data.preview_title,
+      preview_description: data.preview_description,
+    } : null };
   },
   validateSearch: (s: Record<string, unknown>) => ({ preview: s["preview"] ? 1 : undefined }),
   head: ({ loaderData }) => {
@@ -50,7 +52,7 @@ function CallPage() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data, error } = await supabase.from("calls").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
+      const { data, error } = await supabase.rpc("get_public_call", { call_slug: slug }).maybeSingle();
       if (error) throw error;
       return data;
     },

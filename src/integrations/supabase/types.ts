@@ -123,7 +123,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_public_call: {
+        Args: { call_slug: string }
+        Returns: {
+          background_url: string
+          fullscreen_video: boolean
+          id: string
+          is_active: boolean
+          person_name: string
+          person_photo_url: string
+          preview_description: string
+          preview_image_url: string
+          preview_title: string
+          ringtone_type: string
+          ringtone_value: string
+          slug: string
+          subtitle: string
+          unmute_button: boolean
+          vibrate: boolean
+          video_type: string
+          video_url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

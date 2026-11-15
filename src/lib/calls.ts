@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Call = Database["public"]["Tables"]["calls"]["Row"];
+export type PublicCall = Database["public"]["Functions"]["get_public_call"]["Returns"][number];
 export type CallInsert = Database["public"]["Tables"]["calls"]["Insert"];
 export type CallEventType = "opened" | "answered" | "declined" | "ended";
 

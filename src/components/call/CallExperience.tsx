@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { formatDuration, logCallEvent, type Call } from "@/lib/calls";
+import { formatDuration, logCallEvent, type PublicCall } from "@/lib/calls";
 import { Ringer } from "@/lib/ringtone";
 import { fromStored, type VideoType } from "@/lib/video";
 import { useIosChromeFix } from "@/lib/iosChromeFix";
@@ -12,7 +12,7 @@ import { IncomingCall } from "./IncomingCall";
 
 type State = "incoming" | "declined" | "connecting" | "active" | "ended" | "closed";
 
-export function CallExperience({ call, track = true }: { call: Call; track?: boolean }) {
+export function CallExperience({ call, track = true }: { call: PublicCall; track?: boolean }) {
   const [state, setState] = useState<State>("incoming");
   const [duration, setDuration] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
