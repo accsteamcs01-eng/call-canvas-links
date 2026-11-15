@@ -34,6 +34,8 @@ use the editor.
 - Public call page (/c/$slug) uses ssr: "data-only" (server loader reads share fields for og tags; UI renders client-side) and must stay free of admin branding; `?preview=1` disables event tracking.
 - Public call reads use `get_public_call` with an exact slug; the fixed-search-path RPC exposes only active playback/share fields, while direct calls SELECT is owner-only. Recheck availability on visits and never let preview bypass the gate.
 - Storage SELECT is bound to `owner_id = auth.uid()::text`; signed media URLs intentionally remain bearer links so public calls and social previews work without sign-in.
+- Media INSERT requires matching authenticated owner_id and first folder; uploads fail before storage access without a verified user to prevent cross-account paths.
+- Public statistics use `log_public_call_event` with exact active slug, allowlisted event and bounded duration; direct client INSERT is revoked so IDs and timestamps are server-controlled.
 - Preset ringtones are synthesized with WebAudio in src/lib/ringtone.ts (no audio files).
 - Admin panel code lives in src/admin (separate from src/components/call); its light theme and Inter font are applied only while the /admin layout is mounted (class on <html>, injected <link>) so the public call page never changes.
 - Link-preview fields and fallback logic belong to src/admin; persist empty overrides as null so defaults can follow changes to the caller without modifying the public call experience.

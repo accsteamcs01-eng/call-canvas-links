@@ -145,6 +145,10 @@ export type Database = {
           video_url: string
         }[]
       }
+      log_public_call_event: {
+        Args: { call_slug: string; duration?: number; event_name: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

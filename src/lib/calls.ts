@@ -17,8 +17,9 @@ export type Bucket = "photos" | "backgrounds" | "ringtones" | "videos";
 
 /** Uploads to a private bucket and returns a long-lived signed URL usable by anyone with the link. */
 export async function uploadMedia(bucket: Bucket, file: Blob, ext: string): Promise<string> {
-  const { data: u } = await supabase.auth.getUser();
-  const path = `${u.user?.id ?? "anon"}/${Date.now()}-${randomSlug(8)}.${ext}`;
+  const { data: u, error: authError } = await supabase.auth.getUser();
+  if (authError || !u.user) throw new Error("Entre na sua conta para enviar arquivos");
+  const path = `${u.user.id}/${Date.now()}-${randomSlug(8)}.${ext}`;
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     contentType: file.type || undefined,
     upsert: false,
@@ -31,8 +32,13 @@ export async function uploadMedia(bucket: Bucket, file: Blob, ext: string): Prom
   return data.signedUrl;
 }
 
-export async function logCallEvent(callId: string, event: CallEventType, duration?: number) {
-  await supabase.from("call_events").insert({ call_id: callId, event, duration_seconds: duration ?? null });
+export async function logCallEvent(slug: string, event: CallEventType, duration?: number) {
+  const { error } = await supabase.rpc("log_public_call_event", {
+    call_slug: slug,
+    event_name: event,
+    ...(duration === undefined ? {} : { duration }),
+  });
+  if (error) throw new Error("Não foi possível registrar a chamada");
 }
 
 export function formatDuration(totalSeconds: number) {

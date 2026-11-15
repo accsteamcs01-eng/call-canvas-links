@@ -24,9 +24,9 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
 
   const log = useCallback(
     (e: "opened" | "answered" | "declined" | "ended", d?: number) => {
-      if (track) logCallEvent(call.id, e, d).catch(() => {});
+      if (track) logCallEvent(call.slug, e, d).catch(() => {});
     },
-    [call.id, track],
+    [call.slug, track],
   );
 
   // Preload images
