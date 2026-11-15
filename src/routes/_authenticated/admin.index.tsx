@@ -14,6 +14,8 @@ import { formatDuration } from "@/lib/calls";
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Dashboard — CallSim" },
       { name: "description", content: "Visão geral do desempenho das suas chamadas." },
       { property: "og:title", content: "Dashboard — CallSim" },

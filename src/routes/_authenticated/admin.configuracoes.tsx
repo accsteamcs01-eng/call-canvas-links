@@ -4,6 +4,8 @@ import { ComingSoon } from "@/admin/components/ComingSoon";
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Configurações — CallSim" },
       { name: "description", content: "Perfil, preferências e exportação de dados." },
       { property: "og:title", content: "Configurações — CallSim" },

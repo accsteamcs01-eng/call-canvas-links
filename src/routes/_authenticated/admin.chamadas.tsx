@@ -25,6 +25,8 @@ import { ShareDialog, callLink } from "@/admin/components/ShareDialog";
 export const Route = createFileRoute("/_authenticated/admin/chamadas")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Chamadas — CallSim" },
       { name: "description", content: "Gerencie, compartilhe e organize suas chamadas de vídeo." },
       { property: "og:title", content: "Chamadas — CallSim" },

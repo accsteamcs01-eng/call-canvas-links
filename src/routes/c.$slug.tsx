@@ -11,6 +11,7 @@ export const Route = createFileRoute("/c/$slug")({
       .from("calls")
       .select("person_name, person_photo_url, preview_image_url, preview_title, preview_description")
       .eq("slug", params.slug)
+      .eq("is_active", true)
       .maybeSingle();
     return { share: data };
   },
@@ -35,15 +36,21 @@ export const Route = createFileRoute("/c/$slug")({
     };
   },
   component: CallPage,
+  errorComponent: CallUnavailable,
+  notFoundComponent: CallUnavailable,
 });
 
 function CallPage() {
   const { slug } = Route.useParams();
   const { preview } = Route.useSearch();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["call", slug],
+    // Recheck availability on every visit, even when this slug is cached.
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
-      const { data, error } = await supabase.from("calls").select("*").eq("slug", slug).maybeSingle();
+      const { data, error } = await supabase.from("calls").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -52,15 +59,21 @@ function CallPage() {
   return (
     <div className="call-root fixed inset-0 flex justify-center overflow-hidden overscroll-none bg-call-black">
       <div className="relative h-dvh w-full max-w-[420px]">
-        {isLoading ? null : data ? (
+        {isLoading || isFetching ? null : data?.is_active === true ? (
           <CallExperience call={data} track={!preview} />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-            <p className="text-[17px] font-medium">Chamada indisponível</p>
-            <p className="mt-2 text-[14px] text-call-ink/60">Este link não existe ou expirou.</p>
-          </div>
+          <CallUnavailable />
         )}
       </div>
+    </div>
+  );
+}
+
+function CallUnavailable() {
+  return (
+    <div className="call-root fixed inset-0 flex flex-col items-center justify-center bg-call-black px-8 text-center">
+      <p className="text-[17px] font-medium">Chamada indisponível</p>
+      <p className="mt-2 text-[14px] text-call-ink/60">Este link não existe ou expirou.</p>
     </div>
   );
 }

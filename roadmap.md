@@ -3,3 +3,4 @@
 - [x] Verify image limits, fallback rules, and saving/reopening the form.
 - [x] Add and test Chrome-on-iOS-only playback recovery without altering other browsers or admin.
 - [x] Verify the call flow and document the physical-iPhone testing limitation.
+- [x] Block inactive public calls, including link metadata and preview mode; verify deactivation and reactivation.

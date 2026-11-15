@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/admin/$id")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Editar chamada — CallSim" },
       { name: "description", content: "Edite sua chamada de vídeo." },
       { property: "og:title", content: "Editar chamada — CallSim" },

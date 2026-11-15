@@ -11,6 +11,8 @@ import { BRAND_NAME } from "@/admin/brand";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Entrar — CallSim" },
       { name: "description", content: "Acesse o painel do CallSim." },
       { property: "og:title", content: "Entrar — CallSim" },
