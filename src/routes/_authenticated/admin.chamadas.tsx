@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Archive, ArchiveRestore, Copy, CopyPlus, Eye, LayoutGrid, List, MoreHorizontal, Pencil, PhoneCall, Plus, Search, Share2, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, BarChart3, Copy, CopyPlus, Eye, LayoutGrid, List, MoreHorizontal, Pencil, PhoneCall, Plus, Search, Share2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -102,6 +102,7 @@ function CallsPage() {
       <DropdownMenuContent align="end" className="admin-root w-48">
         <DropdownMenuItem onClick={() => copy(c.slug)}><Copy className="h-4 w-4" /> Copiar link</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setShare(c)}><Share2 className="h-4 w-4" /> Compartilhar</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate({ to: "/admin/chamadas/$id", params: { id: c.id } })}><BarChart3 className="h-4 w-4" /> Métricas</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setPreview(c.slug)}><Eye className="h-4 w-4" /> Pré-visualizar</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate({ to: "/admin/$id", params: { id: c.id } })}><Pencil className="h-4 w-4" /> Editar</DropdownMenuItem>
         <DropdownMenuItem onClick={() => duplicate(c)}><CopyPlus className="h-4 w-4" /> Duplicar</DropdownMenuItem>
@@ -172,7 +173,7 @@ function CallsPage() {
               </div>
               <div className="space-y-3 p-4 pt-9">
                 <div className="flex items-start justify-between gap-2">
-                  <Link to="/admin/$id" params={{ id: c.id }} className="min-w-0">
+                  <Link to="/admin/chamadas/$id" params={{ id: c.id }} className="min-w-0">
                     <h3 className="truncate font-semibold hover:text-primary">{c.title}</h3>
                     <p className="truncate text-sm text-muted-foreground">{c.person_name} · {new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
                   </Link>
@@ -206,7 +207,7 @@ function CallsPage() {
                 <TableRow key={c.id} data-state={sel.has(c.id) ? "selected" : undefined}>
                   <TableCell><Checkbox checked={sel.has(c.id)} onCheckedChange={() => toggleSel(c.id)} aria-label="Selecionar" /></TableCell>
                   <TableCell>
-                    <Link to="/admin/$id" params={{ id: c.id }} className="flex items-center gap-3">
+                    <Link to="/admin/chamadas/$id" params={{ id: c.id }} className="flex items-center gap-3">
                       <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                         {c.background_url && <img src={c.background_url} alt="" className="h-full w-full object-cover" />}
                         {c.person_photo_url && <img src={c.person_photo_url} alt="" className="absolute bottom-0.5 right-0.5 h-6 w-6 rounded-full border-2 border-card object-cover" />}

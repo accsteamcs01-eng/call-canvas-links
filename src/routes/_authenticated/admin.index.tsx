@@ -106,7 +106,7 @@ function Dashboard() {
             <ol className="space-y-2">
               {view.top.map(({ c, s }, i) => (
                 <li key={c.id}>
-                  <Link to="/admin/$id" params={{ id: c.id }} className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-muted">
+                  <Link to="/admin/chamadas/$id" params={{ id: c.id }} className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-muted">
                     <span className="w-5 text-center text-sm font-semibold text-muted-foreground">{i + 1}</span>
                     <img src={c.person_photo_url ?? undefined} alt="" className="h-9 w-9 rounded-full bg-muted object-cover" />
                     <div className="min-w-0 flex-1">
