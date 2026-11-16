@@ -209,6 +209,7 @@ html.admin-light {
 @utility animate-call-drift { animation: call-drift 18s ease-in-out infinite; }
 @utility animate-call-wiggle { animation: call-wiggle 2.2s ease-in-out infinite; }
 @utility animate-call-fade { animation: call-fade 0.6s ease-out both; }
+@utility animate-call-dots { animation: call-dots 1.2s ease-in-out infinite; }
 
 .call-root {
   font-family: var(--font-call);

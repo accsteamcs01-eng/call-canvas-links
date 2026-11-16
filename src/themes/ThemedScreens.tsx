@@ -5,6 +5,7 @@ import { Avatar, CallBackdrop } from "@/components/call/CallBackdrop";
 import { EndedScreen } from "@/components/call/EndedScreen";
 import { IncomingCall } from "@/components/call/IncomingCall";
 import { THEMES, resolveTheme } from "./index";
+import { LoadingDots } from "./shared/CallStatus";
 import { MessengerActive } from "./messenger/MessengerActive";
 import { MessengerIncoming } from "./messenger/MessengerIncoming";
 import { ThemeConnecting, ThemeEnded } from "./shared/Screens";
@@ -30,6 +31,7 @@ const telegramConnecting = (name: string, photo?: string | null, background?: st
       <Avatar src={photo} name={name} size={120} />
       <h1 className="mt-7 text-[26px] font-semibold">{name}</h1>
       <p className="mt-1.5 text-[16px] text-call-ink/70">Conectando...</p>
+      <div className="mt-5"><LoadingDots className="bg-call-ink/60" /></div>
     </div>
   </div>
 );

@@ -6,6 +6,7 @@ import { LockIcon, SpeakerIcon } from "./CallIcons";
 import { RemoteVideo } from "./RemoteVideo";
 import { SelfView } from "./SelfView";
 import { Avatar, CallBackdrop } from "./CallBackdrop";
+import { CallBuffering, RetryButton } from "@/themes/shared/CallStatus";
 import type { IosChromePlayback } from "@/lib/iosChromeFix";
 
 interface Props {
@@ -31,6 +32,8 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
   const [speakerOn, setSpeakerOn] = useState(true);
   const [needsUnmute, setNeedsUnmute] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [buffering, setBuffering] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [stream, setStream] = useState<MediaStream | null>(initialStream);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,6 +74,13 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
     onEnd(secondsRef.current);
   }, [onEnd]);
 
+  /** Reloads the source instead of leaving the lead on a dead screen. */
+  const retryVideo = useCallback(() => {
+    setVideoError(false);
+    setBuffering(false);
+    setReloadKey((k) => k + 1);
+  }, []);
+
   const flip = async () => {
     const next = facing === "user" ? "environment" : "user";
     const s = await onFlipCamera(next);
@@ -88,20 +98,28 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <Avatar src={photo} name={name} size={120} />
             <p className="mt-5 text-[15px] text-call-ink/70">Conexão instável…</p>
+            <RetryButton onClick={retryVideo} />
           </div>
         </>
       ) : (
-        <RemoteVideo
-          video={video}
-          iosPlayback={iosPlayback ?? null}
-          muted={!speakerOn}
-          onEnded={finish}
-          onAutoplayMuted={() => {
-            setSpeakerOn(false);
-            if (showUnmuteButton) setNeedsUnmute(true);
-          }}
-          onError={() => setVideoError(true)}
-        />
+        <>
+          {/* The blurred cover stands in for the video's first frame, so the wait is never black. */}
+          <CallBackdrop src={background ?? photo} dark />
+          <RemoteVideo
+            key={reloadKey}
+            video={video}
+            iosPlayback={iosPlayback ?? null}
+            muted={!speakerOn}
+            onEnded={finish}
+            onAutoplayMuted={() => {
+              setSpeakerOn(false);
+              if (showUnmuteButton) setNeedsUnmute(true);
+            }}
+            onError={() => setVideoError(true)}
+            onBufferingChange={setBuffering}
+          />
+          {buffering && <CallBuffering />}
+        </>
       )}
 
       {/* Top bar */}

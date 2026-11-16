@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Phone, Volume2 } from "lucide-react";
 import { Avatar } from "@/components/call/CallBackdrop";
 import type { CallTheme } from "../index";
+import { LoadingDots } from "./CallStatus";
 
 /** Blurred photo backdrop tinted with the theme overlay. */
 export function ThemeBackdrop({ theme, src, animated = false }: { theme: CallTheme; src?: string | null | undefined; animated?: boolean }) {
@@ -32,6 +33,7 @@ export function ThemeConnecting({ theme, name, photo, background }: CommonProps)
         <Avatar src={photo} name={name} size={120} />
         <h1 className="mt-7 text-[26px] font-semibold">{name}</h1>
         <p className={`mt-1.5 text-[16px] ${theme.colors.muted}`}>{theme.texts.connecting}</p>
+        <div className="mt-5"><LoadingDots className="bg-call-ink/60" /></div>
       </div>
     </div>
   );
