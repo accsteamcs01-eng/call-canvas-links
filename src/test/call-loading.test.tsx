@@ -59,7 +59,7 @@ describe("connecting gate", () => {
 
   it("holds the connecting screen while the video is not buffered", async () => {
     render(<CallExperience call={call()} track={false} />);
-    fireEvent.click(await screen.findByLabelText("Atender"));
+    fireEvent.click(await screen.findByRole("button", { name: "Atender" }));
     expect(await screen.findByText("Conectando...")).toBeInTheDocument();
     await new Promise((r) => setTimeout(r, 1500));
     expect(screen.getByText("Conectando...")).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("connecting gate", () => {
 
   it("enters the call as soon as the video reports it can play", async () => {
     const { container } = render(<CallExperience call={call()} track={false} />);
-    fireEvent.click(await screen.findByLabelText("Atender"));
+    fireEvent.click(await screen.findByRole("button", { name: "Atender" }));
     await screen.findByText("Conectando...");
     const warm = container.querySelector('[data-testid="warm-video"]');
     expect(warm).not.toBeNull();
