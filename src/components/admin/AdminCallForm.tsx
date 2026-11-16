@@ -12,6 +12,8 @@ import { PRESET_RINGTONES, Ringer } from "@/lib/ringtone";
 import { embedUrl, parseVideoInput } from "@/lib/video";
 import { ImageCropper } from "./ImageCropper";
 import { LinkPreviewFields } from "@/admin/components/LinkPreviewFields";
+import { ThemePicker } from "@/admin/components/ThemePicker";
+import { resolveTheme, type CallThemeId } from "@/themes";
 
 interface Props {
   initial?: Call | null;
@@ -35,6 +37,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
   const [vibrate, setVibrate] = useState(initial?.vibrate ?? true);
   const [fullscreen, setFullscreen] = useState(initial?.fullscreen_video ?? true);
   const [unmute, setUnmute] = useState(initial?.unmute_button ?? true);
+  const [theme, setTheme] = useState<CallThemeId>(resolveTheme(initial?.theme));
   const [cropFile, setCropFile] = useState<File | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -96,6 +99,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
       vibrate,
       fullscreen_video: fullscreen,
       unmute_button: unmute,
+      theme,
     };
     try {
       if (initial) {
@@ -207,6 +211,10 @@ export function AdminCallForm({ initial, onSaved }: Props) {
         onDescription={setPreviewDescription}
         onUpload={(file) => upload("photos", file, file.name.split(".").pop() || "jpg", "Enviando prévia...")}
       />
+
+      <Field label="Tema visual da chamada" hint="É o que quem abre o link vê">
+        <ThemePicker value={theme} onChange={setTheme} />
+      </Field>
 
       <Field label="Toque de chamada">
         <div className="grid grid-cols-2 gap-2">
