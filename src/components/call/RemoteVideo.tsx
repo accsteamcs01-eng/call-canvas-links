@@ -299,7 +299,10 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError, o
         preload="auto"
         className="absolute inset-0 h-full w-full object-cover"
         onEnded={() => cb.current.onEnded()}
-        onError={() => cb.current.onError()}
+        onError={() => {
+          callDiag.error();
+          cb.current.onError();
+        }}
         disablePictureInPicture
         controls={false}
       />
