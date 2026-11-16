@@ -26,6 +26,8 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   const ringer = useRef<Ringer | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  /** iOS only: set once the call ends so a camera permission accepted too late is discarded. */
+  const endedRef = useRef(false);
   const readyRef = useRef(false);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const video = useMemo(() => fromStored(call.video_url, call.video_type as VideoType), [call]);
@@ -128,6 +130,10 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   const getCamera = async (facing: "user" | "environment") => {
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
+      if (isIOS() && endedRef.current) {
+        s.getTracks().forEach((t) => t.stop());
+        return null;
+      }
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = s;
       setStream(s);
@@ -164,6 +170,7 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
     }
     setState("connecting");
     if (isIOS()) {
+      endedRef.current = false;
       // Original pre-optimization behavior: a fixed wait from the tap, whatever the video does.
       const timer = setTimeout(() => setState("active"), FIXED_CONNECTING_MS);
       timers.current.add(timer);
@@ -186,6 +193,7 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   };
 
   const end = (secs: number) => {
+    if (isIOS()) endedRef.current = true;
     iosFix.playback?.stop();
     stopStream();
     setDuration(secs);

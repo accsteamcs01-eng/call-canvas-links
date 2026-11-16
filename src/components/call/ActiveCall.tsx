@@ -1,3 +1,4 @@
+import { isIOS } from "@/lib/platform";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDuration } from "@/lib/calls";
 import type { ParsedVideo } from "@/lib/video";
@@ -39,6 +40,14 @@ export function ActiveCall({ name, photo, background, video, stream: initialStre
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const secondsRef = useRef(0);
   const ended = useRef(false);
+
+  // iOS only: a camera permission accepted after the call opened delivers its stream late.
+  const lateStream = initialStream;
+  useEffect(() => {
+    if (!isIOS() || !lateStream) return;
+    setStream(lateStream);
+    setCameraOn(true);
+  }, [lateStream]);
 
   useEffect(() => {
     if (!iosPlayback || !iosMutedFallback) return;

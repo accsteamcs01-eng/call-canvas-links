@@ -1,3 +1,4 @@
+import { isIOS } from "@/lib/platform";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { IosChromePlayback } from "@/lib/iosChromeFix";
 
@@ -25,6 +26,14 @@ export function useActiveCall(opts: {
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const secondsRef = useRef(0);
   const ended = useRef(false);
+
+  // iOS only: a camera permission accepted after the call opened delivers its stream late.
+  const lateStream = opts.stream;
+  useEffect(() => {
+    if (!isIOS() || !lateStream) return;
+    setStream(lateStream);
+    setCameraOn(true);
+  }, [lateStream]);
 
   useEffect(() => {
     if (!iosPlayback || !iosMutedFallback) return;
