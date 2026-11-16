@@ -38,7 +38,7 @@ export function ThemeConnecting({ theme, name, photo, background }: CommonProps)
 }
 
 export function ThemeEnded({ theme, name, photo, background, title, detail, actionLabel, onAction, variant = "close" }: CommonProps & {
-  title: string; detail?: string; actionLabel: string; onAction: () => void; variant?: "callback" | "close";
+  title: string; detail?: string | undefined; actionLabel: string; onAction: () => void; variant?: "callback" | "close";
 }) {
   return (
     <div className="absolute inset-0 animate-call-fade">

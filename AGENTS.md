@@ -40,3 +40,4 @@ use the editor.
 - Admin panel code lives in src/admin (separate from src/components/call); its light theme and Inter font are applied only while the /admin layout is mounted (class on <html>, injected <link>) so the public call page never changes.
 - Link-preview fields and fallback logic belong to src/admin; persist empty overrides as null so defaults can follow changes to the caller without modifying the public call experience.
 - iOS Chrome playback recovery lives in an isolated browser-gated module and reuses gesture-unlocked video elements across permission prompts; other browsers retain the existing call flow.
+- Call themes live in src/themes: ThemedScreens picks the screens for a call's stored theme and Telegram's own components and markup stay untouched, so adding a theme means new files, not edits to the existing call flow.
