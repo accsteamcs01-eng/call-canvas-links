@@ -4,3 +4,4 @@
 - [x] Add and test Chrome-on-iOS-only playback recovery without altering other browsers or admin.
 - [x] Verify the call flow and document the physical-iPhone testing limitation.
 - [x] Block inactive public calls, including link metadata and preview mode; verify deactivation and reactivation.- [x] Passo 2: per-call metrics page at /admin/chamadas/:id
+- [x] Visual themes: WhatsApp and Messenger screens on the public call page, theme picker in the create/edit form, theme label in the calls list.
