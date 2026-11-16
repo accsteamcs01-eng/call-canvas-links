@@ -26,7 +26,7 @@ export function CallBuffering({ theme }: { theme?: CallTheme }) {
       role="status"
       aria-label="Carregando vídeo"
     >
-      <div className={`flex items-center rounded-full ${theme ? theme.colors.panel : "bg-call-panel"} px-4 py-2.5 backdrop-blur-md`}>
+      <div className={`absolute left-1/2 top-[32%] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full ${theme ? theme.colors.panel : "bg-call-panel"} px-4 py-2.5 backdrop-blur-md`}>
         <LoadingDots />
       </div>
     </div>
