@@ -57,7 +57,7 @@ export function ThemedActive({ theme, ...props }: { theme: unknown } & ThemedAct
 }
 
 export function ThemedEnded({ theme, name, photo, background, title, detail, actionLabel, onAction, variant = "close" }: ScreensProps & {
-  title: string; detail?: string; actionLabel: string; onAction: () => void; variant?: "callback" | "close";
+  title: string; detail?: string | undefined; actionLabel: string; onAction: () => void; variant?: "callback" | "close";
 }) {
   const id = resolveTheme(theme);
   if (id === "telegram") {
