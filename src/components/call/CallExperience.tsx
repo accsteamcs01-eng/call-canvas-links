@@ -9,7 +9,7 @@ import { Play } from "lucide-react";
 import { THEMES, resolveTheme } from "@/themes";
 import { ThemedActive, ThemedConnecting, ThemedEnded, ThemedIncoming } from "@/themes/ThemedScreens";
 
-type State = "incoming" | "declined" | "connecting" | "active" | "ended" | "closed";
+type State = "incoming" | "declined" | "connecting" | "connecting-fading" | "active" | "ended" | "closed";
 
 /** How long the "Conectando..." screen takes to fade out once the video is ready. */
 const FADE_MS = 450;
@@ -20,14 +20,13 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   const [state, setState] = useState<State>("incoming");
   const [duration, setDuration] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [fading, setFading] = useState(false);
   const ringer = useRef<Ringer | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const readyRef = useRef(false);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const video = useMemo(() => fromStored(call.video_url, call.video_type as VideoType), [call]);
-  const iosFix = useIosChromeFix(rootRef, video, state === "active");
+  const iosFix = useIosChromeFix(rootRef, video, state === "active" || state === "connecting-fading");
   const theme = resolveTheme(call.theme);
   const t = THEMES[theme];
   /** Only a progressive mp4 can be warmed up without touching the element that will play it. */
@@ -164,9 +163,9 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
     const started = Date.now();
     await getCamera("user");
     await waitUntilReady(started);
-    setState("active");
-    setFading(true);
-    const timer = setTimeout(() => setFading(false), FADE_MS);
+    // One atomic switch: the call mounts under the connecting screen, which then fades out.
+    setState("connecting-fading");
+    const timer = setTimeout(() => setState("active"), FADE_MS);
     timers.current.add(timer);
   };
 
@@ -222,15 +221,15 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
         />
       )}
 
-      {(state === "connecting" || (state === "active" && fading)) && (
+      {(state === "connecting" || state === "connecting-fading") && (
         <div
-          className={`absolute inset-0 z-40 transition-opacity duration-[450ms] ${fading ? "pointer-events-none opacity-0" : "opacity-100"}`}
+          className={`absolute inset-0 z-40 transition-opacity duration-[450ms] ${state === "connecting-fading" ? "pointer-events-none opacity-0" : "opacity-100"}`}
         >
           <ThemedConnecting theme={theme} {...common} />
         </div>
       )}
 
-      {state === "active" && (
+      {(state === "active" || state === "connecting-fading") && (
         <ThemedActive
           theme={theme}
           {...common}
@@ -259,7 +258,7 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
       )}
 
       {state === "closed" && <div className="absolute inset-0 bg-call-black" />}
-      {state === "active" && iosFix.needsStart && (
+      {(state === "active" || state === "connecting-fading") && iosFix.needsStart && (
         <Button type="button" variant="ghost" aria-label="Iniciar vídeo" onClick={() => iosFix.playback?.retry()}
           className="absolute left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 rounded-full bg-call-panel text-call-ink backdrop-blur-xl">
           <Play /> Iniciar vídeo
