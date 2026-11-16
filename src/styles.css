@@ -231,3 +231,33 @@ html.ios-chrome-call-fix .call-root video::-webkit-media-controls {
   opacity: 0;
   pointer-events: none;
 }
+
+/* Call themes (WhatsApp / Messenger) — additive tokens, Telegram untouched. */
+:root {
+  --wa-accept: oklch(0.78 0.2 150);      /* #25D366 */
+  --wa-decline: oklch(0.68 0.19 15);     /* #F15C6D */
+  --wa-overlay: oklch(0.17 0.02 230 / 0.7); /* #0B141A @70% */
+  --wa-panel: oklch(0.2 0.02 230 / 0.82);
+  --wa-muted: oklch(0.82 0.01 230);
+  --ms-blue: oklch(0.6 0.21 255);        /* #0084FF */
+  --ms-purple: oklch(0.58 0.27 305);     /* #A033FF */
+  --ms-green: oklch(0.65 0.16 145);      /* #31A24C */
+  --ms-decline: oklch(0.63 0.23 25);
+  --ms-gradient: linear-gradient(160deg, oklch(0.6 0.21 255 / 0.78), oklch(0.58 0.27 305 / 0.78));
+}
+@theme inline {
+  --color-wa-accept: var(--wa-accept);
+  --color-wa-decline: var(--wa-decline);
+  --color-wa-overlay: var(--wa-overlay);
+  --color-wa-panel: var(--wa-panel);
+  --color-wa-muted: var(--wa-muted);
+  --color-ms-blue: var(--ms-blue);
+  --color-ms-purple: var(--ms-purple);
+  --color-ms-green: var(--ms-green);
+  --color-ms-decline: var(--ms-decline);
+}
+@utility bg-ms-gradient { background: var(--ms-gradient); background-size: 200% 200%; }
+@keyframes ms-shift { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+@keyframes theme-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@utility animate-ms-shift { animation: ms-shift 10s ease-in-out infinite; }
+@utility animate-theme-pulse { animation: theme-pulse 2.4s ease-in-out infinite; }

@@ -12,6 +12,10 @@ interface Props {
   name?: string;
   bottomInset: number;
   iosPlayback?: IosChromePlayback | null;
+  /** Optional theme overrides; defaults preserve the Telegram look. */
+  defaultCorner?: Corner;
+  topInset?: number;
+  frameClassName?: string;
 }
 
 const W = 108;
@@ -19,10 +23,10 @@ const H = 160;
 const M = 12;
 
 /** Draggable rounded self-view that snaps to the nearest corner. */
-export function SelfView({ stream, cameraOn, mirrored, bottomInset, iosPlayback }: Props) {
+export function SelfView({ stream, cameraOn, mirrored, bottomInset, iosPlayback, defaultCorner = "tr", topInset = 76, frameClassName = "rounded-2xl" }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const [corner, setCorner] = useState<Corner>("tr");
+  const [corner, setCorner] = useState<Corner>(defaultCorner);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const start = useRef<{ px: number; py: number; x: number; y: number } | null>(null);
 
@@ -45,7 +49,7 @@ export function SelfView({ stream, cameraOn, mirrored, bottomInset, iosPlayback 
     const r = parentRect();
     const pw = r?.width ?? 390;
     const ph = r?.height ?? 800;
-    const top = 76;
+    const top = topInset;
     return {
       x: c.endsWith("l") ? M : pw - W - M,
       y: c.startsWith("t") ? top : ph - H - bottomInset - M,
@@ -57,7 +61,7 @@ export function SelfView({ stream, cameraOn, mirrored, bottomInset, iosPlayback 
   return (
     <div
       ref={boxRef}
-      className="absolute z-20 overflow-hidden rounded-2xl bg-call-dark shadow-2xl ring-1 ring-call-ink/10 touch-none"
+      className={`absolute z-20 overflow-hidden ${frameClassName} bg-call-dark shadow-2xl ring-1 ring-call-ink/10 touch-none`}
       style={{
         width: W,
         height: H,

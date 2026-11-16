@@ -63,6 +63,7 @@ export type Database = {
           ringtone_value: string
           slug: string
           subtitle: string
+          theme: string
           title: string
           unmute_button: boolean
           user_id: string
@@ -86,6 +87,7 @@ export type Database = {
           ringtone_value?: string
           slug: string
           subtitle?: string
+          theme?: string
           title?: string
           unmute_button?: boolean
           user_id?: string
@@ -109,6 +111,7 @@ export type Database = {
           ringtone_value?: string
           slug?: string
           subtitle?: string
+          theme?: string
           title?: string
           unmute_button?: boolean
           user_id?: string
@@ -139,6 +142,7 @@ export type Database = {
           ringtone_value: string
           slug: string
           subtitle: string
+          theme: string
           unmute_button: boolean
           vibrate: boolean
           video_type: string
