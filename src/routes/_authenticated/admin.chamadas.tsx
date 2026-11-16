@@ -17,6 +17,7 @@ import { PhonePreview } from "@/components/admin/PhonePreview";
 import { supabase } from "@/integrations/supabase/client";
 import { randomSlug, type Call } from "@/lib/calls";
 import { useCallsData } from "@/admin/data";
+import { resolveTheme, THEMES, type CallThemeId } from "@/themes";
 import { summarize, type EventRow } from "@/admin/metrics";
 import { EmptyState } from "@/admin/components/EmptyState";
 import { ConfirmDialog } from "@/admin/components/ConfirmDialog";
@@ -38,6 +39,8 @@ export const Route = createFileRoute("/_authenticated/admin/chamadas")({
 
 type Filter = "all" | "active" | "archived";
 type Sort = "recent" | "opened" | "answered" | "az";
+
+const THEME_DOT: Record<CallThemeId, string> = { telegram: "bg-call-accept", whatsapp: "bg-wa-accept", messenger: "bg-ms-blue" };
 
 function CallsPage() {
   const qc = useQueryClient();
@@ -117,6 +120,15 @@ function CallsPage() {
   const Status = ({ c }: { c: Call }) => c.archived ? <Badge variant="secondary">Arquivada</Badge>
     : c.is_active ? <Badge className="border-0 bg-admin-green/15 text-admin-green hover:bg-admin-green/15">Ativa</Badge>
     : <Badge variant="outline" className="text-muted-foreground">Inativa</Badge>;
+  const ThemeBadge = ({ c, className = "" }: { c: Call; className?: string }) => {
+    const id = resolveTheme(c.theme);
+    return (
+      <Badge variant="outline" className={`gap-1.5 font-normal text-muted-foreground ${className}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${THEME_DOT[id]}`} />
+        {THEMES[id].label}
+      </Badge>
+    );
+  };
   const ActiveSwitch = ({ c }: { c: Call }) => (
     <Switch checked={c.is_active} aria-label="Ativa" onCheckedChange={(v) => update([c.id], { is_active: v }, v ? "Chamada ativada" : "Chamada desativada")} />
   );
@@ -182,6 +194,7 @@ function CallsPage() {
                 <div className="flex items-center gap-4 text-sm">
                   <span><b className="tabular-nums">{s.opened}</b> <span className="text-muted-foreground">aberturas</span></span>
                   <span><b className="tabular-nums">{s.answered}</b> <span className="text-muted-foreground">atendidas</span></span>
+                  <ThemeBadge c={c} className="ml-auto" />
                 </div>
                 <div className="flex items-center gap-2 border-t pt-3">
                   <Button size="sm" onClick={() => copy(c.slug)}><Copy className="h-3.5 w-3.5" /> Copiar link</Button>
@@ -198,7 +211,7 @@ function CallsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10"><Checkbox checked={allSelected} onCheckedChange={(v) => setSel(v ? new Set(rows.map((r) => r.c.id)) : new Set())} aria-label="Selecionar todas" /></TableHead>
-                <TableHead>Chamada</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Aberturas</TableHead>
+                <TableHead>Chamada</TableHead><TableHead>Status</TableHead><TableHead>Tema</TableHead><TableHead className="text-right">Aberturas</TableHead>
                 <TableHead className="text-right">Atendidas</TableHead><TableHead>Criada em</TableHead><TableHead>Ativa</TableHead><TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -216,6 +229,7 @@ function CallsPage() {
                     </Link>
                   </TableCell>
                   <TableCell><Status c={c} /></TableCell>
+                  <TableCell><ThemeBadge c={c} /></TableCell>
                   <TableCell className="text-right tabular-nums">{s.opened}</TableCell>
                   <TableCell className="text-right tabular-nums">{s.answered}</TableCell>
                   <TableCell className="whitespace-nowrap text-muted-foreground">{new Date(c.created_at).toLocaleDateString("pt-BR")}</TableCell>
