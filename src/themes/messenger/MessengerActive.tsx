@@ -5,6 +5,7 @@ import { Avatar } from "@/components/call/CallBackdrop";
 import { RemoteVideo } from "@/components/call/RemoteVideo";
 import { SelfView } from "@/components/call/SelfView";
 import { THEMES } from "../index";
+import { CallBuffering, RetryButton } from "../shared/CallStatus";
 import { ThemeBackdrop, UnmuteButton } from "../shared/Screens";
 import { useActiveCall } from "../shared/useActiveCall";
 import type { ThemedActiveProps } from "../whatsapp/WhatsAppActive";
@@ -31,10 +32,16 @@ export function MessengerActive(p: ThemedActiveProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <Avatar src={p.photo} name={p.name} size={120} />
             <p className={`mt-5 text-[15px] ${t.colors.muted}`}>{t.texts.unstable}</p>
+            <RetryButton onClick={s.retryVideo} />
           </div>
         </>
       ) : (
-        <RemoteVideo video={p.video} iosPlayback={p.iosPlayback ?? null} muted={!s.speakerOn} onEnded={s.finish} onAutoplayMuted={s.onAutoplayMuted} onError={s.onVideoError} />
+        <>
+          {/* The blurred cover stands in for the video's first frame, so the wait is never black. */}
+          <ThemeBackdrop theme={t} src={p.background ?? p.photo} animated />
+          <RemoteVideo key={s.reloadKey} video={p.video} iosPlayback={p.iosPlayback ?? null} muted={!s.speakerOn} onEnded={s.finish} onAutoplayMuted={s.onAutoplayMuted} onError={s.onVideoError} onBufferingChange={s.setBuffering} />
+          {s.buffering && <CallBuffering theme={t} />}
+        </>
       )}
 
       <div className={`absolute inset-x-0 top-0 z-30 bg-gradient-to-b from-call-black/60 to-transparent px-4 pb-10 pt-[calc(env(safe-area-inset-top)+14px)] transition-opacity duration-300 ${show}`}>

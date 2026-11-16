@@ -18,6 +18,8 @@ export function useActiveCall(opts: {
   const [speakerOn, setSpeakerOn] = useState(true);
   const [needsUnmute, setNeedsUnmute] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [buffering, setBuffering] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [stream, setStream] = useState<MediaStream | null>(opts.stream);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +60,13 @@ export function useActiveCall(opts: {
     onEnd(secondsRef.current);
   }, [onEnd]);
 
+  /** Reloads the source instead of leaving the lead on a dead screen. */
+  const retryVideo = useCallback(() => {
+    setVideoError(false);
+    setBuffering(false);
+    setReloadKey((k) => k + 1);
+  }, []);
+
   const flip = async () => {
     const next = facing === "user" ? "environment" : "user";
     const s = await onFlipCamera(next);
@@ -77,7 +86,8 @@ export function useActiveCall(opts: {
   };
 
   return {
-    seconds, controlsVisible, bumpControls, cameraOn, micOn, speakerOn, needsUnmute, videoError, facing, stream,
+    seconds, controlsVisible, bumpControls, cameraOn, micOn, speakerOn, needsUnmute, videoError, buffering, reloadKey, facing, stream,
+    setBuffering, retryVideo,
     finish, flip, unmute,
     toggleCamera: () => setCameraOn((v) => !v),
     toggleMic: () => setMicOn((v) => !v),
