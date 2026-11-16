@@ -102,3 +102,46 @@ describe("video problem", () => {
     expect(container.querySelector("video")).not.toBeNull();
   });
 });
+
+describe("iOS branch", () => {
+  const realUA = navigator.userAgent;
+
+  const asIPhone = () => {
+    Object.defineProperty(navigator, "userAgent", {
+      value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
+      configurable: true,
+    });
+  };
+
+  afterEach(() => {
+    Object.defineProperty(navigator, "userAgent", { value: realUA, configurable: true });
+  });
+
+  it("does not render the warm-up preload element on iOS", async () => {
+    asIPhone();
+    const { container } = render(<CallExperience call={call()} track={false} />);
+    await screen.findByRole("button", { name: "Atender" });
+    expect(container.querySelector('[data-testid="warm-video"]')).toBeNull();
+  });
+
+  it("leaves the connecting screen after the fixed wait with no video event", async () => {
+    asIPhone();
+    render(<CallExperience call={call()} track={false} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Atender" }));
+    expect(await screen.findByText("Conectando...")).toBeInTheDocument();
+    // No canplay/playing is ever fired: the fixed timer alone must end the wait.
+    await waitFor(() => expect(screen.queryByText("Conectando...")).toBeNull(), { timeout: 4000 });
+  });
+
+  it("does not retry play() when the browser pauses the video on iOS", async () => {
+    asIPhone();
+    const { container } = render(activeCall());
+    const el = container.querySelector("video");
+    expect(el).not.toBeNull();
+    const spy = vi.spyOn(el as HTMLVideoElement, "play");
+    fireEvent(el!, new Event("pause"));
+    await new Promise((r) => setTimeout(r, 1200));
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+});

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { embedUrl, type ParsedVideo } from "@/lib/video";
 import type { IosChromePlayback } from "@/lib/iosChromeFix";
 import { BUFFERING_DELAY_MS, MAX_RESUME_TRIES, RESUME_SPACING_MS, callDiag, isStalled } from "@/lib/callLoading";
+import { isIOS } from "@/lib/platform";
 import { IosChromeVideo } from "./IosChromeVideo";
 
 interface Props {
@@ -137,6 +138,9 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError, o
     };
 
     // The app never pauses this video, so any pause came from the browser and is recovered.
+    // Auto-resume is Android/desktop-only: on iOS the video plays exactly as it did before,
+    // with no extra play() attempts.
+    const autoResume = !isIOS();
     let tries = 0;
     let tap: (() => void) | null = null;
     const disarmTap = () => {
@@ -193,8 +197,10 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError, o
       tries = 0;
     };
 
-    el.addEventListener("pause", onPause);
-    el.addEventListener("playing", resetTries);
+    if (autoResume) {
+      el.addEventListener("pause", onPause);
+      el.addEventListener("playing", resetTries);
+    }
     const stopHealth = watchBuffering(el, (b) => cb.current.onBufferingChange?.(b));
 
     const play = async () => {
@@ -236,9 +242,11 @@ export function RemoteVideo({ video, muted, onEnded, onAutoplayMuted, onError, o
       stopHealth();
       timers.forEach(clearTimeout);
       timers.clear();
-      el.removeEventListener("pause", onPause);
-      el.removeEventListener("playing", resetTries);
-      disarmTap();
+      if (autoResume) {
+        el.removeEventListener("pause", onPause);
+        el.removeEventListener("playing", resetTries);
+        disarmTap();
+      }
       hls?.destroy();
     };
   }, [video, iosPlayback]);

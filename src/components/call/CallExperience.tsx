@@ -4,6 +4,7 @@ import { Ringer } from "@/lib/ringtone";
 import { fromStored, type VideoType } from "@/lib/video";
 import { useIosChromeFix } from "@/lib/iosChromeFix";
 import { callDiag, shouldLeaveConnecting } from "@/lib/callLoading";
+import { isIOS } from "@/lib/platform";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { THEMES, resolveTheme } from "@/themes";
@@ -15,6 +16,8 @@ type State = "incoming" | "declined" | "connecting" | "connecting-fading" | "act
 const FADE_MS = 450;
 /** Readiness is polled, never assumed, so a stalled download can never hang the screen. */
 const POLL_MS = 120;
+/** iOS keeps the original fixed wait: no video events, no readiness gate, no fade. */
+const FIXED_CONNECTING_MS = 1500;
 
 export function CallExperience({ call, track = true }: { call: PublicCall; track?: boolean }) {
   const [state, setState] = useState<State>("incoming");
@@ -29,8 +32,8 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   const iosFix = useIosChromeFix(rootRef, video, state === "active" || state === "connecting-fading");
   const theme = resolveTheme(call.theme);
   const t = THEMES[theme];
-  /** Only a progressive mp4 can be warmed up without touching the element that will play it. */
-  const canWarm = video.type === "mp4" && !video.isHls && !iosFix.playback;
+  /** Only a progressive mp4 can be warmed up without touching the element that will play it. Never on iOS. */
+  const canWarm = !isIOS() && video.type === "mp4" && !video.isHls && !iosFix.playback;
 
   const markReady = useCallback(() => {
     readyRef.current = true;
@@ -160,13 +163,20 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
       rootRef.current.requestFullscreen().catch(() => {});
     }
     setState("connecting");
+    if (isIOS()) {
+      // Original pre-optimization behavior: a fixed wait from the tap, whatever the video does.
+      const timer = setTimeout(() => setState("active"), FIXED_CONNECTING_MS);
+      timers.current.add(timer);
+      await getCamera("user");
+      return;
+    }
     const started = Date.now();
     await getCamera("user");
     await waitUntilReady(started);
     // One atomic switch: the call mounts under the connecting screen, which then fades out.
     setState("connecting-fading");
-    const timer = setTimeout(() => setState("active"), FADE_MS);
-    timers.current.add(timer);
+    const fadeTimer = setTimeout(() => setState("active"), FADE_MS);
+    timers.current.add(fadeTimer);
   };
 
   const decline = () => {
