@@ -5,10 +5,8 @@ import { fromStored, type VideoType } from "@/lib/video";
 import { useIosChromeFix } from "@/lib/iosChromeFix";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
-import { ActiveCall } from "./ActiveCall";
-import { Avatar, CallBackdrop } from "./CallBackdrop";
-import { EndedScreen } from "./EndedScreen";
-import { IncomingCall } from "./IncomingCall";
+import { THEMES, resolveTheme } from "@/themes";
+import { ThemedActive, ThemedConnecting, ThemedEnded, ThemedIncoming } from "@/themes/ThemedScreens";
 
 type State = "incoming" | "declined" | "connecting" | "active" | "ended" | "closed";
 
@@ -21,6 +19,8 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
   const streamRef = useRef<MediaStream | null>(null);
   const video = useMemo(() => fromStored(call.video_url, call.video_type as VideoType), [call]);
   const iosFix = useIosChromeFix(rootRef, video, state === "active");
+  const theme = resolveTheme(call.theme);
+  const t = THEMES[theme];
 
   const log = useCallback(
     (e: "opened" | "answered" | "declined" | "ended", d?: number) => {
@@ -125,32 +125,25 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
       )}
 
       {state === "incoming" && (
-        <IncomingCall {...common} subtitle={call.subtitle || "Chamada de vídeo"} onAccept={accept} onDecline={decline} />
+        <ThemedIncoming theme={theme} {...common} subtitle={call.subtitle || "Chamada de vídeo"} onAccept={accept} onDecline={decline} />
       )}
 
       {state === "declined" && (
-        <EndedScreen
+        <ThemedEnded
+          theme={theme}
           {...common}
-          title="Chamada recusada"
-          actionLabel="Ligar de volta"
+          title={t.texts.declined}
+          actionLabel={t.texts.callBack}
           variant="callback"
           onAction={() => setState("incoming")}
         />
       )}
 
-      {state === "connecting" && (
-        <div className="absolute inset-0 animate-call-fade">
-          <CallBackdrop src={common.background ?? common.photo} />
-          <div className="relative flex h-full flex-col items-center justify-center">
-            <Avatar src={common.photo} name={common.name} size={120} />
-            <h1 className="mt-7 text-[26px] font-semibold">{common.name}</h1>
-            <p className="mt-1.5 text-[16px] text-call-ink/70">Conectando...</p>
-          </div>
-        </div>
-      )}
+      {state === "connecting" && <ThemedConnecting theme={theme} {...common} />}
 
       {state === "active" && (
-        <ActiveCall
+        <ThemedActive
+          theme={theme}
           {...common}
           video={video}
           stream={stream}
@@ -163,11 +156,12 @@ export function CallExperience({ call, track = true }: { call: PublicCall; track
       )}
 
       {state === "ended" && (
-        <EndedScreen
+        <ThemedEnded
+          theme={theme}
           {...common}
-          title="Chamada encerrada"
+          title={t.texts.ended}
           detail={formatDuration(duration)}
-          actionLabel="Fechar"
+          actionLabel={t.texts.close}
           onAction={() => {
             window.close();
             setState("closed");
