@@ -6,10 +6,10 @@ interface Props {
   photo?: string | null | undefined;
   background?: string | null | undefined;
   title: string;
-  detail?: string;
+  detail?: string | undefined;
   actionLabel: string;
   onAction: () => void;
-  variant?: "callback" | "close";
+  variant?: "callback" | "close" | undefined;
 }
 
 /** Used for both "Chamada recusada" and "Chamada encerrada". */
