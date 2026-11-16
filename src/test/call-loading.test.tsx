@@ -52,9 +52,9 @@ describe("connecting gate", () => {
   });
 
   it("counts a frozen clock as buffering only while the video is playing", () => {
-    expect(isStalled(5000, 4200, false)).toBe(true);
+    expect(isStalled(5000, 4000, false)).toBe(true);
     expect(isStalled(5000, 4400, false)).toBe(false);
-    expect(isStalled(5000, 4200, true)).toBe(false);
+    expect(isStalled(5000, 4000, true)).toBe(false);
   });
 
   it("holds the connecting screen while the video is not buffered", async () => {
