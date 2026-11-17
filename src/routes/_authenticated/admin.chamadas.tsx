@@ -17,7 +17,8 @@ import { PhonePreview } from "@/components/admin/PhonePreview";
 import { supabase } from "@/integrations/supabase/client";
 import { randomSlug, type Call } from "@/lib/calls";
 import { useCallsData } from "@/admin/data";
-import { resolveTheme, THEMES, type CallThemeId } from "@/themes";
+import { resolveTheme, THEMES } from "@/themes";
+import { ThemeIcon } from "@/themes/ThemeIcon";
 import { summarize, type EventRow } from "@/admin/metrics";
 import { EmptyState } from "@/admin/components/EmptyState";
 import { ConfirmDialog } from "@/admin/components/ConfirmDialog";
@@ -39,8 +40,6 @@ export const Route = createFileRoute("/_authenticated/admin/chamadas")({
 
 type Filter = "all" | "active" | "archived";
 type Sort = "recent" | "opened" | "answered" | "az";
-
-const THEME_DOT: Record<CallThemeId, string> = { telegram: "bg-call-accept", whatsapp: "bg-wa-accept", messenger: "bg-ms-blue" };
 
 function CallsPage() {
   const qc = useQueryClient();
@@ -124,7 +123,7 @@ function CallsPage() {
     const id = resolveTheme(c.theme);
     return (
       <Badge variant="outline" className={`gap-1.5 font-normal text-muted-foreground ${className}`}>
-        <span className={`h-1.5 w-1.5 rounded-full ${THEME_DOT[id]}`} />
+        <ThemeIcon theme={id} className="h-4 w-4" />
         {THEMES[id].label}
       </Badge>
     );

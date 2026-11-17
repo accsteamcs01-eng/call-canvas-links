@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { Copy, Download, MessageCircle } from "lucide-react";
+import { Copy, Download } from "lucide-react";
+import { ThemeIcon } from "@/themes/ThemeIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,7 @@ export function ShareDialog({ call, onClose }: { call: Call | null; onClose: () 
           <div className="space-y-2">
             <Textarea rows={3} value={msg} onChange={(e) => setMsg(e.target.value)} />
             <Button className="w-full bg-admin-green text-admin-white hover:bg-admin-green/90" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")}>
-              <MessageCircle className="h-4 w-4" /> Enviar no WhatsApp
+              <ThemeIcon theme="whatsapp" className="h-5 w-5" /> Enviar no WhatsApp
             </Button>
           </div>
           {qr && (

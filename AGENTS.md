@@ -44,3 +44,4 @@ use the editor.
 - Active-call loading rules (connecting gate timing, buffering detection, resume budget) live in src/lib/callLoading.ts and the shared indicator in src/themes/shared/CallStatus.tsx, so every theme reuses one loading behaviour and the answer gesture stays untouched.
 
 - Create/edit call forms keep draft state in the form and use an admin-only phone simulation plus TanStack navigation blocking; previews never request camera access, ring or record events.
+- Service logos use the shared ThemeIcon and CDN asset pointers; keep them separate from the app favicon and branding because they identify call themes, not the application.

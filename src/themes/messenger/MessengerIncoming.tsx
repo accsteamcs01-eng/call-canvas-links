@@ -1,6 +1,7 @@
 import { PhoneOff, Video } from "lucide-react";
 import { Avatar } from "@/components/call/CallBackdrop";
 import { THEMES } from "../index";
+import { ThemeIcon } from "../ThemeIcon";
 import { RoundAction, ThemeBackdrop } from "../shared/Screens";
 
 const t = THEMES.messenger;
@@ -20,7 +21,7 @@ export function MessengerIncoming({ name, photo, background, onAccept, onDecline
             <Avatar src={photo} name={name} size={150} />
           </div>
           <h1 className="mt-10 max-w-full truncate text-center text-[30px] font-semibold leading-tight">{name}</h1>
-          <p className="mt-1.5 text-[15px] text-call-ink/75">{t.texts.header}</p>
+          <p className="mt-1.5 flex items-center gap-2 text-[15px] text-call-ink/75"><ThemeIcon theme="messenger" className="h-5 w-5" />{t.texts.header}</p>
         </div>
         <div className="flex w-full max-w-[280px] items-start justify-between">
           <RoundAction label={t.texts.decline} className={t.colors.decline} onClick={onDecline} size={70}><PhoneOff className="h-8 w-8" /></RoundAction>

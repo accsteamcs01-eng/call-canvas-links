@@ -1,12 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { THEMES, THEME_IDS, type CallThemeId } from "@/themes";
-
-const DOT: Record<CallThemeId, string> = {
-  telegram: "bg-call-accept",
-  whatsapp: "bg-wa-accept",
-  messenger: "bg-ms-blue",
-};
+import { ThemeIcon } from "@/themes/ThemeIcon";
 
 /** Three tappable cards, each a miniature of the incoming-call screen in that theme. */
 export function ThemePicker({
@@ -32,6 +27,7 @@ export function ThemePicker({
           >
             <div className="relative h-24 overflow-hidden rounded-lg bg-call-dark">
               <div className={`absolute inset-0 ${t.colors.overlay}`} />
+              <ThemeIcon theme={id} className="absolute right-2 top-2 h-6 w-6" />
               <span className="absolute left-1/2 top-3 h-9 w-9 -translate-x-1/2 rounded-full bg-call-ink/20 ring-2 ring-call-ink/35" />
               <span className="absolute left-1/2 top-[52px] h-1 w-10 -translate-x-1/2 rounded-full bg-call-ink/25" />
               <div className="absolute inset-x-3 bottom-2 flex items-center justify-between">
@@ -40,7 +36,7 @@ export function ThemePicker({
               </div>
             </div>
             <div className="mt-1.5 flex items-center gap-1">
-              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[id]}`} />
+              <ThemeIcon theme={id} className="h-4 w-4" />
               <span className="truncate text-xs font-medium">{t.label}</span>
               {active && <Check className="ml-auto h-3.5 w-3.5 shrink-0 text-primary" />}
             </div>

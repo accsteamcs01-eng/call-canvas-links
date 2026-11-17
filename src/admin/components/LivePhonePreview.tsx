@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BatteryFull, Phone, PhoneOff, Signal, UserRound, Video, Wifi } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { THEMES, type CallThemeId } from "@/themes";
+import { ThemeIcon } from "@/themes/ThemeIcon";
 import { embedUrl, type ParsedVideo } from "@/lib/video";
 import { resolveLinkPreview } from "../link-preview";
 
@@ -27,7 +28,7 @@ export function LivePhonePreview(props: Props) {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Prévia ao vivo</h2>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-admin-green" />
+          <ThemeIcon theme={props.theme} className="h-5 w-5" />
           {t.label}
         </span>
       </div>
@@ -50,6 +51,7 @@ export function LivePhonePreview(props: Props) {
             )}
             <div className={`absolute inset-0 ${t.colors.overlay}`} />
             <div className="relative flex h-full flex-col items-center px-6 pb-8 pt-14 font-call">
+              <ThemeIcon theme={props.theme} className="mb-3 h-8 w-8" />
               <p className="text-center text-xs text-call-ink/80">
                 {props.subtitle || t.texts.header}
               </p>
@@ -123,6 +125,7 @@ export function LivePhonePreview(props: Props) {
         )}
         {mode === "link" && (
           <div className="flex h-full items-center bg-background px-4 text-foreground">
+            <ThemeIcon theme="whatsapp" className="absolute left-5 top-12 h-7 w-7" />
             <figure className="w-full overflow-hidden rounded-lg border bg-card">
               {link.image && (
                 <img

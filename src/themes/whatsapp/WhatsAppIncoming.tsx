@@ -1,6 +1,7 @@
 import { Bell, Lock, MessageCircle, PhoneOff, Video } from "lucide-react";
 import { Avatar } from "@/components/call/CallBackdrop";
 import { THEMES } from "../index";
+import { ThemeIcon } from "../ThemeIcon";
 import { RoundAction, ThemeBackdrop } from "../shared/Screens";
 
 const t = THEMES.whatsapp;
@@ -13,6 +14,7 @@ export function WhatsAppIncoming({ name, photo, background, onAccept, onDecline 
       <ThemeBackdrop theme={t} src={background ?? photo} />
       <div className="relative flex h-full flex-col items-center px-6 pt-[calc(env(safe-area-inset-top)+28px)] pb-[calc(env(safe-area-inset-bottom)+36px)]">
         <div className={`flex items-center gap-1.5 text-[13px] ${t.colors.muted}`}>
+          <ThemeIcon theme="whatsapp" className="h-5 w-5" />
           <Lock className="h-3 w-3" /> <span>{t.texts.header}</span>
         </div>
         <h1 className="mt-3 max-w-full truncate text-center text-[30px] font-normal leading-tight">{name}</h1>
