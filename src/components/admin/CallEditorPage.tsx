@@ -16,22 +16,34 @@ export function CallEditorPage({ initial }: { initial?: Call | null }) {
   const link = saved ? `${window.location.origin}/c/${saved.slug}` : "";
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <Link to="/admin/chamadas" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+    <div className="mx-auto max-w-6xl">
+      <Link
+        to="/admin/chamadas"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-4 w-4" /> Voltar
       </Link>
-      <h1 className="mb-6 font-display text-2xl font-semibold">{initial ? "Editar chamada" : "Nova chamada"}</h1>
+      <h1 className="mb-6 font-display text-2xl font-semibold">
+        {initial ? "Editar chamada" : "Nova chamada"}
+      </h1>
 
       {saved && (
-        <div className="mb-6 space-y-3 rounded-2xl border border-primary/40 bg-accent p-4">
+        <div className="mb-6 space-y-3 rounded-lg border border-primary/40 bg-accent p-4">
           <p className="text-sm font-medium">Link da chamada</p>
           <div className="flex gap-2">
             <Input readOnly value={link} onFocus={(e) => e.target.select()} />
-            <Button onClick={() => { navigator.clipboard.writeText(link); toast.success("Link copiado"); }}>
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(link);
+                toast.success("Link copiado");
+              }}
+            >
               <Copy className="h-4 w-4" /> Copiar link
             </Button>
           </div>
-          <Button variant="secondary" size="sm" onClick={() => setPreview(true)}><Eye className="h-4 w-4" /> Pré-visualização</Button>
+          <Button variant="secondary" size="sm" onClick={() => setPreview(true)}>
+            <Eye className="h-4 w-4" /> Pré-visualização
+          </Button>
         </div>
       )}
 
@@ -41,6 +53,7 @@ export function CallEditorPage({ initial }: { initial?: Call | null }) {
         onSaved={(c) => {
           setSaved(c);
           qc.invalidateQueries({ queryKey: ["calls"] });
+          qc.invalidateQueries({ queryKey: ["call-edit", c.id] });
           toast.success("Chamada salva");
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}

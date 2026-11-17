@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { THEMES, THEME_IDS, type CallThemeId } from "@/themes";
 
@@ -8,19 +9,26 @@ const DOT: Record<CallThemeId, string> = {
 };
 
 /** Three tappable cards, each a miniature of the incoming-call screen in that theme. */
-export function ThemePicker({ value, onChange }: { value: CallThemeId; onChange: (t: CallThemeId) => void }) {
+export function ThemePicker({
+  value,
+  onChange,
+}: {
+  value: CallThemeId;
+  onChange: (t: CallThemeId) => void;
+}) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {THEME_IDS.map((id) => {
         const t = THEMES[id];
         const active = value === id;
         return (
-          <button
+          <Button
+            variant="ghost"
             key={id}
             type="button"
             onClick={() => onChange(id)}
             aria-pressed={active}
-            className={`rounded-xl border p-2 text-left transition-colors ${active ? "border-primary bg-accent" : "hover:bg-muted"}`}
+            className={`h-auto flex-col items-stretch whitespace-normal rounded-lg border p-2 text-left transition-colors ${active ? "border-primary bg-accent" : "hover:bg-muted"}`}
           >
             <div className="relative h-24 overflow-hidden rounded-lg bg-call-dark">
               <div className={`absolute inset-0 ${t.colors.overlay}`} />
@@ -36,7 +44,7 @@ export function ThemePicker({ value, onChange }: { value: CallThemeId; onChange:
               <span className="truncate text-xs font-medium">{t.label}</span>
               {active && <Check className="ml-auto h-3.5 w-3.5 shrink-0 text-primary" />}
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>

@@ -42,3 +42,5 @@ use the editor.
 - iOS Chrome playback recovery lives in an isolated browser-gated module and reuses gesture-unlocked video elements across permission prompts; other browsers retain the existing call flow.
 - Call themes live in src/themes: ThemedScreens picks the screens for a call's stored theme and Telegram's own components and markup stay untouched, so adding a theme means new files, not edits to the existing call flow.
 - Active-call loading rules (connecting gate timing, buffering detection, resume budget) live in src/lib/callLoading.ts and the shared indicator in src/themes/shared/CallStatus.tsx, so every theme reuses one loading behaviour and the answer gesture stays untouched.
+
+- Create/edit call forms keep draft state in the form and use an admin-only phone simulation plus TanStack navigation blocking; previews never request camera access, ring or record events.
