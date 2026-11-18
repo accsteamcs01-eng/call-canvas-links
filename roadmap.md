@@ -9,3 +9,4 @@
 - [x] iOS-only fix: fixed 1.5s "Conectando..." wait, no warm preload, no auto-resume, no fade on iOS; Android/desktop loading optimization unchanged.
 - [x] Passo 3: reorganize create/edit fields, live phone preview, completion progress, floating save bar, and unsaved-change warning; verified creation, reopening, editing and discarding on desktop/mobile.
 - [x] Add supplied service icons to theme selection, call list, live simulation, WhatsApp sharing/preview, and existing service labels on incoming screens; preserve Telegram's public markup.
+- [ ] Passo 4: private saved contacts, create/edit/delete with photo, call-form selection and usage counts; verify signed-in persistence and mobile layout.

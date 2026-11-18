@@ -50,6 +50,7 @@ export type Database = {
         Row: {
           archived: boolean
           background_url: string | null
+          contact_id: string | null
           created_at: string
           fullscreen_video: boolean
           id: string
@@ -74,6 +75,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           background_url?: string | null
+          contact_id?: string | null
           created_at?: string
           fullscreen_video?: boolean
           id?: string
@@ -98,6 +100,7 @@ export type Database = {
         Update: {
           archived?: boolean
           background_url?: string | null
+          contact_id?: string | null
           created_at?: string
           fullscreen_video?: boolean
           id?: string
@@ -118,6 +121,41 @@ export type Database = {
           vibrate?: boolean
           video_type?: string
           video_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_contact_owner_fkey"
+            columns: ["contact_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          subtitle: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          subtitle?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          subtitle?: string
+          user_id?: string
         }
         Relationships: []
       }

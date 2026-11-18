@@ -45,3 +45,4 @@ use the editor.
 
 - Create/edit call forms keep draft state in the form and use an admin-only phone simulation plus TanStack navigation blocking; previews never request camera access, ring or record events.
 - Service logos use the shared ThemeIcon and CDN asset pointers; keep them separate from the app favicon and branding because they identify call themes, not the application.
+- Saved contacts are owner-private presets in src/admin; calls keep copied playback fields plus an owner-bound contact_id for usage counts, so editing or deleting a contact never changes existing public call content.

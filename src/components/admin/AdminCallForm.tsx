@@ -43,6 +43,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LivePhonePreview } from "@/admin/components/LivePhonePreview";
 import { formCompletion, hasUnsavedChanges } from "@/admin/form-state";
+import { ContactPicker } from "@/admin/components/ContactPicker";
+import { contactFields } from "@/admin/contacts";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   initial?: Call | null;
@@ -57,6 +60,8 @@ const TYPE_LABEL = {
 } as const;
 
 export function AdminCallForm({ initial, onSaved }: Props) {
+  const qc = useQueryClient();
+  const [contactId, setContactId] = useState<string | null>(initial?.contact_id ?? null);
   const [title, setTitle] = useState(initial?.title ?? "");
   const [videoInput, setVideoInput] = useState(initial?.video_url ?? "");
   const [name, setName] = useState(initial?.person_name ?? "");
@@ -83,6 +88,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
 
   const [section, setSection] = useState("information");
   const snapshot = JSON.stringify({
+    contactId,
     title,
     videoInput,
     name,
@@ -162,6 +168,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
     }
     setBusy("Salvando...");
     const payload = {
+      contact_id: contactId,
       title: title.trim() || name.trim(),
       video_url: video.url,
       video_type: video.type,
@@ -188,6 +195,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
           .select()
           .single();
         if (error) throw error;
+        void qc.invalidateQueries({ queryKey: ["contact-usage"] });
         setSavedSnapshot(snapshot);
         onSaved(data);
       } else {
@@ -198,6 +206,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
             .select()
             .single();
           if (!error) {
+            void qc.invalidateQueries({ queryKey: ["contact-usage"] });
             setSavedSnapshot(snapshot);
             return onSaved(data);
           }
@@ -245,7 +254,11 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                     value={id as string}
                     className="gap-1.5 rounded-md border border-transparent px-3 py-2.5 text-xs data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-none"
                   >
-                    {id === "preview" ? <ThemeIcon theme="whatsapp" className="h-4 w-4" /> : <SectionIcon className="h-3.5 w-3.5" />}
+                    {id === "preview" ? (
+                      <ThemeIcon theme="whatsapp" className="h-4 w-4" />
+                    ) : (
+                      <SectionIcon className="h-3.5 w-3.5" />
+                    )}
                     {label as string}
                   </TabsTrigger>
                 );
@@ -335,6 +348,19 @@ export function AdminCallForm({ initial, onSaved }: Props) {
           </TabsContent>
           <TabsContent value="person" className="space-y-6 rounded-lg border bg-card p-5 sm:p-6">
             <h2 className="text-base font-semibold">Pessoa</h2>
+            <Field label="Contato salvo">
+              <ContactPicker
+                value={contactId}
+                onDetach={() => setContactId(null)}
+                onSelect={(contact) => {
+                  const fields = contactFields(contact);
+                  setContactId(fields.contact_id);
+                  setName(fields.person_name);
+                  setPhoto(fields.person_photo_url);
+                  setSubtitle(fields.subtitle);
+                }}
+              />
+            </Field>
             <Field label="Nome da pessoa">
               <Input
                 aria-label="Nome da pessoa"
