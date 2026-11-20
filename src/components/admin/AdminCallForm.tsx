@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LivePhonePreview } from "@/admin/components/LivePhonePreview";
 import { formCompletion, hasUnsavedChanges } from "@/admin/form-state";
+import { MediaPicker } from "@/admin/components/MediaPicker";
 import { ContactPicker } from "@/admin/components/ContactPicker";
 import { contactFields } from "@/admin/contacts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -124,7 +125,9 @@ export function AdminCallForm({ initial, onSaved }: Props) {
   ) => {
     setBusy(label);
     try {
-      return await uploadMedia(bucket, file, ext);
+      const url = await uploadMedia(bucket, file, ext);
+      void qc.invalidateQueries({ queryKey: ["library"] });
+      return url;
     } catch (e) {
       toast.error("Falha no envio: " + (e as Error).message);
       return null;
@@ -320,6 +323,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                     }}
                   />
                 </label>
+                <MediaPicker bucket="videos" onPick={setVideoInput} />
               </div>
               {videoInput && !video && <p className="text-sm text-destructive">Link inválido</p>}
               {video && (
@@ -388,6 +392,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                       }}
                     />
                   </label>
+                  <MediaPicker bucket="photos" onPick={setPhoto} />
                 </div>
               </Field>
             </div>
@@ -424,6 +429,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                     }}
                   />
                 </label>
+                <MediaPicker bucket="backgrounds" onPick={setBg} />
               </div>
             </Field>
           </TabsContent>
@@ -487,6 +493,13 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                     }}
                   />
                 </label>
+                <MediaPicker
+                  bucket="ringtones"
+                  onPick={(url) => {
+                    setRingType("custom");
+                    setRingValue(url);
+                  }}
+                />
                 <Button type="button" variant="secondary" size="sm" onClick={togglePlay}>
                   {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />} Ouvir
                 </Button>
