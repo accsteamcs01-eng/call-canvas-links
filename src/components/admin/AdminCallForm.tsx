@@ -1,3 +1,4 @@
+import { loadDefaults } from "@/admin/settings";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -62,6 +63,7 @@ const TYPE_LABEL = {
 
 export function AdminCallForm({ initial, onSaved }: Props) {
   const qc = useQueryClient();
+  const [defaults] = useState(loadDefaults);
   const [contactId, setContactId] = useState<string | null>(initial?.contact_id ?? null);
   const [title, setTitle] = useState(initial?.title ?? "");
   const [videoInput, setVideoInput] = useState(initial?.video_url ?? "");
@@ -78,10 +80,10 @@ export function AdminCallForm({ initial, onSaved }: Props) {
   );
   const [ringValue, setRingValue] = useState(initial?.ringtone_value ?? "classic");
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? "Chamada de vídeo");
-  const [vibrate, setVibrate] = useState(initial?.vibrate ?? true);
-  const [fullscreen, setFullscreen] = useState(initial?.fullscreen_video ?? true);
-  const [unmute, setUnmute] = useState(initial?.unmute_button ?? true);
-  const [theme, setTheme] = useState<CallThemeId>(resolveTheme(initial?.theme));
+  const [vibrate, setVibrate] = useState(initial?.vibrate ?? defaults.vibrate);
+  const [fullscreen, setFullscreen] = useState(initial?.fullscreen_video ?? defaults.fullscreen);
+  const [unmute, setUnmute] = useState(initial?.unmute_button ?? defaults.unmute);
+  const [theme, setTheme] = useState<CallThemeId>(initial ? resolveTheme(initial.theme) : defaults.theme);
   const [cropFile, setCropFile] = useState<File | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
