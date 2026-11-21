@@ -27,7 +27,6 @@ import { embedUrl, parseVideoInput } from "@/lib/video";
 import { ImageCropper } from "./ImageCropper";
 import { LinkPreviewFields } from "@/admin/components/LinkPreviewFields";
 import { ThemePicker } from "@/admin/components/ThemePicker";
-import { ThemeIcon } from "@/themes/ThemeIcon";
 import { resolveTheme, type CallThemeId } from "@/themes";
 import { useBlocker } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -250,7 +249,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                 ["person", "Pessoa", UserRound],
                 ["appearance", "Aparência", ImageIcon],
                 ["ringtone", "Toque e opções", AudioLines],
-                ["preview", "Prévia WhatsApp", Settings2],
+                ["preview", "Prévia do link", Settings2],
               ].map(([id, label, Icon]) => {
                 const SectionIcon = Icon as typeof FileText;
                 return (
@@ -259,11 +258,7 @@ export function AdminCallForm({ initial, onSaved }: Props) {
                     value={id as string}
                     className="gap-1.5 rounded-md border border-transparent px-3 py-2.5 text-xs data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-none"
                   >
-                    {id === "preview" ? (
-                      <ThemeIcon theme="whatsapp" className="h-4 w-4" />
-                    ) : (
-                      <SectionIcon className="h-3.5 w-3.5" />
-                    )}
+                    <SectionIcon className="h-3.5 w-3.5" />
                     {label as string}
                   </TabsTrigger>
                 );

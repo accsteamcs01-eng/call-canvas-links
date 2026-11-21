@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BatteryFull, Phone, PhoneOff, Signal, UserRound, Video, Wifi } from "lucide-react";
+import { BatteryFull, Link2, Phone, PhoneOff, Signal, UserRound, Video, Wifi } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { THEMES, type CallThemeId } from "@/themes";
 import { ThemeIcon } from "@/themes/ThemeIcon";
@@ -125,12 +125,12 @@ export function LivePhonePreview(props: Props) {
         )}
         {mode === "link" && (
           <div className="flex h-full items-center bg-background px-4 text-foreground">
-            <ThemeIcon theme="whatsapp" className="absolute left-5 top-12 h-7 w-7" />
+            <Link2 className="absolute left-5 top-12 h-6 w-6 text-muted-foreground" />
             <figure className="w-full overflow-hidden rounded-lg border bg-card">
               {link.image && (
                 <img
                   src={link.image}
-                  alt="Prévia WhatsApp"
+                  alt="Imagem de prévia do link"
                   className="aspect-[1200/630] w-full object-cover"
                 />
               )}

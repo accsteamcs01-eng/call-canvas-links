@@ -44,7 +44,7 @@ use the editor.
 - Active-call loading rules (connecting gate timing, buffering detection, resume budget) live in src/lib/callLoading.ts and the shared indicator in src/themes/shared/CallStatus.tsx, so every theme reuses one loading behaviour and the answer gesture stays untouched.
 
 - Create/edit call forms keep draft state in the form and use an admin-only phone simulation plus TanStack navigation blocking; previews never request camera access, ring or record events.
-- Service logos use the shared ThemeIcon and CDN asset pointers; keep them separate from the app favicon and branding because they identify call themes, not the application.
+- Service logos use the shared ThemeIcon and CDN asset pointers; keep them separate from the app favicon and branding because they identify call themes, not the application. The link-preview section is service-neutral (generic link icon, no messenger logo) because previews render in Telegram, WhatsApp and Messenger alike.
 - Saved contacts are owner-private presets in src/admin; calls keep copied playback fields plus an owner-bound contact_id for usage counts, so editing or deleting a contact never changes existing public call content.
 - Media library lists each user's own folder across the four private buckets and re-signs 10-year URLs on read; in-use counts match stored call/contact URLs by bucket+path, so no extra table is needed.
 - New-call defaults (theme/vibrate/fullscreen/unmute) are per-browser localStorage in src/admin/settings.ts and only seed new calls; CSV exports are built client-side from owner-RLS data, so no extra tables or server code.

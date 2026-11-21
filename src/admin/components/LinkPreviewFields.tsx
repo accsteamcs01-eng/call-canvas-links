@@ -1,11 +1,10 @@
-import { ImageIcon, Upload, X } from "lucide-react";
+import { ImageIcon, Link2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { previewImageError, resolveLinkPreview } from "../link-preview";
-import { ThemeIcon } from "@/themes/ThemeIcon";
 
 interface Props {
   name: string;
@@ -27,8 +26,8 @@ export function LinkPreviewFields(props: Props) {
   return (
     <section className="space-y-4" aria-labelledby="link-preview-heading">
       <h2 id="link-preview-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <ThemeIcon theme="whatsapp" className="h-6 w-6" />
-        Prévia do link (WhatsApp)
+        <Link2 className="h-5 w-5" />
+        Prévia do link
       </h2>
       <div className="space-y-2">
         <Label htmlFor="preview-image">Imagem de prévia</Label>
@@ -96,7 +95,7 @@ export function LinkPreviewFields(props: Props) {
         />
       </div>
       <figure
-        aria-label="Card simulado do WhatsApp"
+        aria-label="Card simulado da prévia"
         className="max-w-sm overflow-hidden rounded-lg border bg-muted"
       >
         {preview.image ? (
