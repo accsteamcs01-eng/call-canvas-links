@@ -11,3 +11,5 @@
 - [x] Add supplied service icons to theme selection, call list, live simulation, WhatsApp sharing/preview, and existing service labels on incoming screens; preserve Telegram's public markup.
 - [x] Passo 4: private saved contacts, create/edit/delete with photo, call-form selection and usage counts; verified signed-in persistence, deletion preserves call content, and mobile layout. All 50 tests passed.
 - [x] Passo 5: media library page (list, filter, upload, copy, delete with in-use warning) and 'Escolher da biblioteca' in the call form.
+- [ ] Diagnose admin navigation delays and optimize loading without changing public calls.
+- [ ] Verify signed-in navigation, tab switching, cache refresh and regression tests.
