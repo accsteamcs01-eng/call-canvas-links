@@ -46,6 +46,44 @@ export type Database = {
           },
         ]
       }
+      call_viewers: {
+        Row: {
+          blocked_attempts: number
+          call_id: string
+          first_seen_at: string
+          id: string
+          locked_at: string | null
+          locked_reason: string | null
+          token_hash: string
+        }
+        Insert: {
+          blocked_attempts?: number
+          call_id: string
+          first_seen_at?: string
+          id?: string
+          locked_at?: string | null
+          locked_reason?: string | null
+          token_hash: string
+        }
+        Update: {
+          blocked_attempts?: number
+          call_id?: string
+          first_seen_at?: string
+          id?: string
+          locked_at?: string | null
+          locked_reason?: string | null
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_viewers_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calls: {
         Row: {
           archived: boolean
@@ -62,11 +100,13 @@ export type Database = {
           preview_title: string | null
           ringtone_type: string
           ringtone_value: string
+          single_view: boolean
           slug: string
           subtitle: string
           theme: string
           title: string
           unmute_button: boolean
+          used_message: string | null
           user_id: string
           vibrate: boolean
           video_type: string
@@ -87,11 +127,13 @@ export type Database = {
           preview_title?: string | null
           ringtone_type?: string
           ringtone_value?: string
+          single_view?: boolean
           slug: string
           subtitle?: string
           theme?: string
           title?: string
           unmute_button?: boolean
+          used_message?: string | null
           user_id?: string
           vibrate?: boolean
           video_type?: string
@@ -112,11 +154,13 @@ export type Database = {
           preview_title?: string | null
           ringtone_type?: string
           ringtone_value?: string
+          single_view?: boolean
           slug?: string
           subtitle?: string
           theme?: string
           title?: string
           unmute_button?: boolean
+          used_message?: string | null
           user_id?: string
           vibrate?: boolean
           video_type?: string
@@ -164,6 +208,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_view: {
+        Args: { p_preview?: boolean; p_slug: string; p_token: string }
+        Returns: string
+      }
+      finish_view: {
+        Args: { p_reason?: string; p_slug: string; p_token: string }
+        Returns: undefined
+      }
       get_public_call: {
         Args: { call_slug: string }
         Returns: {
@@ -178,10 +230,12 @@ export type Database = {
           preview_title: string
           ringtone_type: string
           ringtone_value: string
+          single_view: boolean
           slug: string
           subtitle: string
           theme: string
           unmute_button: boolean
+          used_message: string
           vibrate: boolean
           video_type: string
           video_url: string
@@ -191,6 +245,7 @@ export type Database = {
         Args: { call_slug: string; duration?: number; event_name: string }
         Returns: undefined
       }
+      reset_viewers: { Args: { p_call_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

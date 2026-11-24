@@ -8,6 +8,13 @@
       "when": 1795038353570,
       "tag": "0000_add_saved_contacts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795560186993,
+      "tag": "0001_single_view_per_person",
+      "breakpoints": true
     }
   ]
 }
