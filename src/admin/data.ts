@@ -1,10 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Call } from "@/lib/calls";
 import type { EventRow } from "./metrics";
 
-export function useCallsData() {
-  return useQuery({
+export const callsQueryOptions = queryOptions({
     queryKey: ["calls"],
     queryFn: async () => {
       // Run both in parallel; RLS already limits events to the owner's calls.
@@ -16,7 +15,14 @@ export function useCallsData() {
       if (e.error) throw e.error;
       return { calls: c.data as Call[], events: (e.data ?? []) as EventRow[] };
     },
-  });
+});
+
+export function useCallsData(enabled = true) {
+  return useQuery({ ...callsQueryOptions, enabled });
+}
+
+export function useSuspenseCallsData() {
+  return useSuspenseQuery(callsQueryOptions);
 }
 
 export function useUserEmail() {

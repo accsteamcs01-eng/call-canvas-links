@@ -54,7 +54,7 @@ async function listBucket(bucket: Bucket, userId: string): Promise<MediaItem[]> 
   if (e2) throw e2;
   return files.map((f, i) => ({
     bucket,
-    path: paths[i]!,
+    path: `${userId}/${f.name}`,
     name: f.name,
     size: Number((f.metadata as { size?: number } | null)?.size ?? 0),
     createdAt: f.created_at ?? "",
@@ -66,9 +66,13 @@ export const libraryQueryOptions = queryOptions({
   queryKey: ["library"],
   staleTime: 60_000,
   queryFn: async () => {
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) return [];
-    const lists = await Promise.all(LIBRARY_BUCKETS.map((b) => listBucket(b.id, u.user!.id)));
+    // The route already checks the session; storage still enforces owner RLS.
+    // Avoid a separate auth network round trip before the four parallel reads.
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    const userId = data.session?.user.id;
+    if (!userId) return [];
+    const lists = await Promise.all(LIBRARY_BUCKETS.map((b) => listBucket(b.id, userId)));
     return lists.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 });

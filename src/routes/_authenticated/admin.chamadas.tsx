@@ -16,7 +16,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PhonePreview } from "@/components/admin/PhonePreview";
 import { supabase } from "@/integrations/supabase/client";
 import { randomSlug, type Call } from "@/lib/calls";
-import { useCallsData } from "@/admin/data";
+import { callsQueryOptions, useSuspenseCallsData } from "@/admin/data";
+import { AdminLoadError, AdminNotFound, AdminPending } from "@/admin/components/RouteFeedback";
 import { resolveTheme, THEMES } from "@/themes";
 import { ThemeIcon } from "@/themes/ThemeIcon";
 import { summarize, type EventRow } from "@/admin/metrics";
@@ -25,6 +26,12 @@ import { ConfirmDialog } from "@/admin/components/ConfirmDialog";
 import { ShareDialog, callLink } from "@/admin/components/ShareDialog";
 
 export const Route = createFileRoute("/_authenticated/admin/chamadas")({
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData({ ...callsQueryOptions, revalidateIfStale: true }); },
+  pendingMs: 150,
+  pendingMinMs: 0,
+  pendingComponent: AdminPending,
+  errorComponent: AdminLoadError,
+  notFoundComponent: AdminNotFound,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
@@ -44,7 +51,7 @@ type Sort = "recent" | "opened" | "answered" | "az";
 function CallsPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data, isLoading } = useCallsData();
+  const { data, isLoading } = useSuspenseCallsData();
   const [view, setView] = useState<"grid" | "table">("grid");
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -57,7 +64,11 @@ function CallsPage() {
   const rows = useMemo(() => {
     if (!data) return [];
     const by = new Map<string, EventRow[]>();
-    for (const e of data.events) by.set(e.call_id, [...(by.get(e.call_id) ?? []), e]);
+    for (const e of data.events) {
+      const group = by.get(e.call_id);
+      if (group) group.push(e);
+      else by.set(e.call_id, [e]);
+    }
     const term = q.trim().toLowerCase();
     return data.calls
       .filter((c) => filter === "all" ? !c.archived : filter === "archived" ? c.archived : !c.archived && c.is_active)

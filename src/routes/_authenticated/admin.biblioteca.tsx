@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/admin/components/ConfirmDialog";
 import { EmptyState } from "@/admin/components/EmptyState";
 import { MediaThumb } from "@/admin/components/MediaThumb";
+import { AdminLoadError, AdminNotFound, AdminPending } from "@/admin/components/RouteFeedback";
 import {
   formatBytes, libraryQueryOptions, libraryUsageQueryOptions, LIBRARY_BUCKETS, mediaUsage, type MediaItem,
 } from "@/admin/library";
@@ -15,11 +16,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia, type Bucket } from "@/lib/calls";
 
 export const Route = createFileRoute("/_authenticated/admin/biblioteca")({
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(libraryQueryOptions),
-      context.queryClient.ensureQueryData(libraryUsageQueryOptions),
-    ]),
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData({ ...libraryQueryOptions, revalidateIfStale: true }),
+      context.queryClient.ensureQueryData({ ...libraryUsageQueryOptions, revalidateIfStale: true }),
+    ]);
+  },
+  pendingMs: 150,
+  pendingMinMs: 0,
+  pendingComponent: AdminPending,
+  errorComponent: AdminLoadError,
+  notFoundComponent: AdminNotFound,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },

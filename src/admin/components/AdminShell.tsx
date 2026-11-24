@@ -1,6 +1,6 @@
-import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { LogOut, Moon, Plus, Search, Sun, UserRound } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader,
@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 import { NAV, isActivePath, pageTitle } from "../nav";
 import { useAdminTheme } from "../theme";
-import { useCallsData, useUserEmail } from "../data";
+import { useUserEmail } from "../data";
 import { Logo, LogoIcon } from "./Logo";
+
+const GlobalSearch = lazy(() => import("./GlobalSearch"));
 
 function usePath() {
   return useRouterState({ select: (s) => s.location.pathname.replace(/\/$/, "") || "/" });
@@ -70,36 +71,6 @@ function AppSidebar() {
   );
 }
 
-function GlobalSearch({ open, setOpen }: { open: boolean; setOpen: (o: boolean) => void }) {
-  const navigate = useNavigate();
-  const { data } = useCallsData();
-  const go = (fn: () => void) => { setOpen(false); fn(); };
-  return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Buscar páginas e chamadas..." />
-      <CommandList>
-        <CommandEmpty>Nada encontrado.</CommandEmpty>
-        <CommandGroup heading="Páginas">
-          {NAV.map((n) => (
-            <CommandItem key={n.to} onSelect={() => go(() => navigate({ to: n.to }))}><n.icon className="h-4 w-4" />{n.title}</CommandItem>
-          ))}
-          <CommandItem onSelect={() => go(() => navigate({ to: "/admin/new" }))}><Plus className="h-4 w-4" />Nova chamada</CommandItem>
-        </CommandGroup>
-        {!!data?.calls.length && (
-          <CommandGroup heading="Chamadas">
-            {data.calls.map((c) => (
-              <CommandItem key={c.id} value={`${c.title} ${c.person_name} ${c.id}`} onSelect={() => go(() => navigate({ to: "/admin/$id", params: { id: c.id } }))}>
-                <span className="truncate">{c.title}</span>
-                <span className="ml-auto truncate text-xs text-muted-foreground">{c.person_name}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
-    </CommandDialog>
-  );
-}
-
 function Topbar({ onSearch, theme, toggleTheme }: { onSearch: () => void; theme: string; toggleTheme: () => void }) {
   const path = usePath();
   const { data: email } = useUserEmail();
@@ -110,10 +81,10 @@ function Topbar({ onSearch, theme, toggleTheme }: { onSearch: () => void; theme:
       <LogoIcon className="h-7 w-7 md:hidden" />
       <h1 className="truncate text-base font-semibold">{pageTitle(path)}</h1>
       <div className="ml-auto flex items-center gap-2">
-        <button onClick={onSearch} className="hidden h-9 w-64 items-center gap-2 rounded-lg border bg-card px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 sm:flex">
+        <Button variant="outline" onClick={onSearch} className="hidden h-9 w-64 justify-start gap-2 bg-card px-3 text-sm font-normal text-muted-foreground sm:flex">
           <Search className="h-4 w-4" /> Buscar...
           <kbd className="ml-auto rounded border bg-muted px-1.5 text-[10px]">Ctrl K</kbd>
-        </button>
+        </Button>
         <Button variant="ghost" size="icon" className="sm:hidden" onClick={onSearch} aria-label="Buscar"><Search className="h-4 w-4" /></Button>
         <Button asChild size="sm">
           <Link to="/admin/new"><Plus className="h-4 w-4" /><span className="hidden sm:inline">Nova chamada</span></Link>
@@ -155,8 +126,27 @@ function BottomNav() {
 }
 
 export function AdminShell() {
+  const router = useRouter();
   const { theme, toggle } = useAdminTheme();
   const [search, setSearch] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    // Warm common screens after the current screen paints, not all storage buckets.
+    const warm = async () => {
+      for (const to of ["/admin", "/admin/chamadas", "/admin/new"] as const) {
+        if (cancelled) return;
+        await router.preloadRoute({ to }).catch(() => undefined);
+      }
+    };
+    const timer = window.setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => { if (!cancelled) void warm(); }, { timeout: 3000 });
+      } else {
+        void warm();
+      }
+    }, 500);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [router]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setSearch((s) => !s); }
@@ -178,7 +168,7 @@ export function AdminShell() {
           <main className="flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10"><Outlet /></main>
         </div>
         <BottomNav />
-        <GlobalSearch open={search} setOpen={setSearch} />
+        {search && <Suspense fallback={null}><GlobalSearch open={search} setOpen={setSearch} /></Suspense>}
       </div>
     </SidebarProvider>
   );

@@ -48,3 +48,4 @@ use the editor.
 - Saved contacts are owner-private presets in src/admin; calls keep copied playback fields plus an owner-bound contact_id for usage counts, so editing or deleting a contact never changes existing public call content.
 - Media library lists each user's own folder across the four private buckets and re-signs 10-year URLs on read; in-use counts match stored call/contact URLs by bucket+path, so no extra table is needed.
 - New-call defaults (theme/vibrate/fullscreen/unmute) are per-browser localStorage in src/admin/settings.ts and only seed new calls; CSV exports are built client-side from owner-RLS data, so no extra tables or server code.
+- Admin loaders share Query options and return cached data immediately with background revalidation; only common screens are warmed after paint, and search is loaded on demand to avoid blocking navigation with unrelated reads.

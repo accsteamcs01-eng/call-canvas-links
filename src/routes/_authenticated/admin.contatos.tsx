@@ -9,14 +9,21 @@ import { contactsQueryOptions, contactUsageQueryOptions, type Contact } from "@/
 import { ContactEditor } from "@/admin/components/ContactEditor";
 import { ConfirmDialog } from "@/admin/components/ConfirmDialog";
 import { EmptyState } from "@/admin/components/EmptyState";
+import { AdminLoadError, AdminNotFound, AdminPending } from "@/admin/components/RouteFeedback";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/contatos")({
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(contactsQueryOptions),
-      context.queryClient.ensureQueryData(contactUsageQueryOptions),
-    ]),
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData({ ...contactsQueryOptions, revalidateIfStale: true }),
+      context.queryClient.ensureQueryData({ ...contactUsageQueryOptions, revalidateIfStale: true }),
+    ]);
+  },
+  pendingMs: 150,
+  pendingMinMs: 0,
+  pendingComponent: AdminPending,
+  errorComponent: AdminLoadError,
+  notFoundComponent: AdminNotFound,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },

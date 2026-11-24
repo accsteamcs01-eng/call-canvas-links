@@ -5,13 +5,20 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useCallsData } from "@/admin/data";
+import { callsQueryOptions, useSuspenseCallsData } from "@/admin/data";
+import { AdminLoadError, AdminNotFound, AdminPending } from "@/admin/components/RouteFeedback";
 import { dailySeries, inPeriod, periodStart, summarize, timeAgo, type Period } from "@/admin/metrics";
 import { StatCard } from "@/admin/components/StatCard";
 import { EmptyState } from "@/admin/components/EmptyState";
 import { formatDuration } from "@/lib/calls";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData({ ...callsQueryOptions, revalidateIfStale: true }); },
+  pendingMs: 150,
+  pendingMinMs: 0,
+  pendingComponent: AdminPending,
+  errorComponent: AdminLoadError,
+  notFoundComponent: AdminNotFound,
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },
@@ -30,7 +37,7 @@ const EVENT_LABEL: Record<string, string> = { opened: "foi aberta", answered: "f
 
 function Dashboard() {
   const [period, setPeriod] = useState<Period>("7d");
-  const { data, isLoading } = useCallsData();
+  const { data, isLoading } = useSuspenseCallsData();
 
   const view = useMemo(() => {
     if (!data) return null;
@@ -38,7 +45,11 @@ function Dashboard() {
     const events = data.events.filter((e) => inPeriod(e.created_at, start));
     const titles = new Map(data.calls.map((c) => [c.id, c.title]));
     const per = new Map<string, typeof events>();
-    for (const e of events) per.set(e.call_id, [...(per.get(e.call_id) ?? []), e]);
+    for (const e of events) {
+      const group = per.get(e.call_id);
+      if (group) group.push(e);
+      else per.set(e.call_id, [e]);
+    }
     const top = data.calls
       .map((c) => ({ c, s: summarize(per.get(c.id) ?? []) }))
       .filter((x) => x.s.opened > 0)
